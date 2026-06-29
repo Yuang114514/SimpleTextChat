@@ -1,5 +1,5 @@
 {
-	"required": true,
+	"required": false,
 	"package": "cn.yuang2714.simple_text_chat.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
