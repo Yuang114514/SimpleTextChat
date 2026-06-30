@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="AudioRecongization" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="cn.yuang2714.simple_text_chat.client.core.AudioRecongization" />
+    <option name="MAIN_CLASS_NAME" value="cn.yuang2714.simple_text_chat.client.core.RecognizationManager" />
     <module name="text_chat.client" />
     <extension name="coverage">
       <pattern>

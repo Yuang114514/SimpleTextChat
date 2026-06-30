@@ -1,5 +1,7 @@
 {
   "key.category.text_chat.keybind": "Simple Text Chat",
   "text.text_chat.key_mappings.feature_toggle": "Toggle Feature",
-  "text.text_chat.key_mappings.speech_done": "Done Speech"
+  "text.text_chat.key_mappings.speech_done": "Done Speech",
+
+  "gui."
 }
