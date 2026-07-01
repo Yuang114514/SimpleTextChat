@@ -13,6 +13,9 @@ A simple mod that allows you to chat with voices while playing by recognize your
 > "You can speak while playing, but you can't type while playing." 
 > 
 > —— Yuang2714's speech on a Minecraft server that has not Simple Voice Chat installed
+>
+> <img width="358" height="31" alt="image" src="https://github.com/user-attachments/assets/db2dd2a3-9417-4ef8-84dc-2b786ee8685f" />
+
 
 ### Recognizer Lifecycle 转写器的生命周期
 
