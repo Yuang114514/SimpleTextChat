@@ -2,11 +2,13 @@
   "key.category.text_chat.keybind": "Simple Text Chat",
   "text.text_chat.key_mappings.feature_toggle": "Toggle Feature",
   "text.text_chat.key_mappings.speech_done": "Done Speech",
-
   "gui.text_chat.setup.title": "Setup Simple Text Chat",
   "gui.text_chat.setup.description.line_1": "Welcome to Simple Text Chat, a simple mod that bring you talking-chatting experience!",
   "gui.text_chat.setup.description.line_2": "Here are some config to do now.",
   "gui.text_chat.setup.description.line_3": "First, download a Vosk model for voice recognization.",
   "gui.text_chat.setup.description.line_4": "Second, select a working mode you prefer!",
-  "gui.text_chat.setup.description.line_5": "Finally, after setup, you can enjoy unique talking-chatting experience!"
+  "gui.text_chat.setup.description.line_5": "Finally, after setup, you can enjoy unique talking-chatting experience!",
+  "gui.text_chat.setup.model.info": "Model Storage Folder",
+  "gui.text_chat.setup.model.download_button_text": "Download Models",
+  "gui.text_chat.setup.mode.info": "Working Mode"
 }

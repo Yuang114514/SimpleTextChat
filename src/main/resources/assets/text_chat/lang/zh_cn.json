@@ -2,11 +2,13 @@
   "key.category.text_chat.keybind": "简单的文本聊天",
   "text.text_chat.key_mappings.feature_toggle": "启用转写",
   "text.text_chat.key_mappings.speech_done": "发送消息",
-
   "gui.text_chat.setup.title": "设置 简单的文本聊天",
   "gui.text_chat.setup.description.line_1": "欢迎来到简单的文本聊天，一个给你带来语音畅聊体验的模组！",
-  "gui.text_chat.setup.description.line_2": "现在，做一些设置，好让语音识别引擎可以工作！",
-  "gui.text_chat.setup.description.line_3": "首先，下载一个Vosk语音模型来提供转写",
+  "gui.text_chat.setup.description.line_2": "现在，做一些设置，好让语音识别引擎可以工作：",
+  "gui.text_chat.setup.description.line_3": "首先，下载一个Vosk语音模型来提供转写，",
   "gui.text_chat.setup.description.line_4": "然后，选择一个你喜欢的工作模式！",
-  "gui.text_chat.setup.description.line_5": "完成设置后，你就可以尽情享受语音畅聊的体验了！"
+  "gui.text_chat.setup.description.line_5": "完成设置后，你就可以尽情享受语音畅聊的体验了！",
+  "gui.text_chat.setup.model.info": "模型存储文件夹",
+  "gui.text_chat.setup.model.download_button_text": "下载模型",
+  "gui.text_chat.setup.mode.info": "工作模式"
 }

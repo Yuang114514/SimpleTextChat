@@ -16,6 +16,11 @@ A simple mod that allows you to chat with voices while playing by recognize your
 >
 > <img width="358" height="31" alt="image" src="https://github.com/user-attachments/assets/db2dd2a3-9417-4ef8-84dc-2b786ee8685f" />
 
+### Vosk lib Usage
+
+本项目使用Vosk作为语音转写引擎，它使用Apache-2.0许可。
+
+This project uses Vosk as recognization engine, which uses Apache-2.0 license.
 
 ### Recognizer Lifecycle 转写器的生命周期
 

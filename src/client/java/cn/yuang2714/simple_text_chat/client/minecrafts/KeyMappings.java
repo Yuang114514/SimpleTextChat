@@ -3,14 +3,13 @@ package cn.yuang2714.simple_text_chat.client.minecrafts;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyMappings {
     public static boolean isEnabled = false;
     
     public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
-            Identifier.fromNamespaceAndPath("text_chat", "keybind")
+            VersionDifferences.resourceLocationFromNamespaceAndPath("text_chat", "keybind")
     );
     
     public static KeyMapping registerFeatureToggleKey() {
