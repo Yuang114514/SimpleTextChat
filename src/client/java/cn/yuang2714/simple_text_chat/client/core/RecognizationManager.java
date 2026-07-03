@@ -165,7 +165,7 @@ public class RecognizationManager extends Thread {
     }
     
     private void sendPlayerChat(String message) {
-        if (message == null || message.isBlank()) return;
+        if (message == null || message.isBlank() || message.equals("我")) return;
         if (cancelKey.isConsumable()) {
             cancelKey.consume();
             return;
