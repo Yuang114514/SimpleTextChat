@@ -58,7 +58,7 @@ public class RecognizationManager extends Thread {
         LOGGER.info("Initializing Recognization Manager.");
         
         model = new Model(Config.getModelStorageFolder().toString());
-        recognizer = new Recognizer(model, 16000.0f, ModelDictionary.get());
+        recognizer = new Recognizer(model, 16000.0f);
         mode = Config.getMode();
         
         Thread recognizationThread = new Thread(this::recognize);
