@@ -5,21 +5,20 @@
 	"name": "Simple Text Chat",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"Me!"
+		"Yuang2714"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Yuang114514/SimpleTextChat"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/text_chat/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"cn.yuang2714.simple_text_chat.SimpleTextChat"
-		],
 		"client": [
 			"cn.yuang2714.simple_text_chat.client.SimpleTextChatClient"
+		],
+		"modmenu": [
+			"cn.yuang2714.simple_text_chat.client.SimpleTextChatModMenuApiImpl"
 		]
 	},
 	"mixins": [
@@ -34,5 +33,10 @@
 		"minecraft": "~26.1.2",
 		"java": ">=25",
 		"fabric-api": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"update_checker": false
+		}
 	}
 }

@@ -12,4 +12,8 @@ public class VersionDifferences {
     public static Identifier resourceLocationFromNamespaceAndPath(String namespace, String path) {
         return Identifier.fromNamespaceAndPath(namespace, path);
     }
+    
+    public static MutableComponent literal(String key) {
+        return Component.literal(key);
+    }
 }
