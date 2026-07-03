@@ -21,13 +21,6 @@
 			"cn.yuang2714.simple_text_chat.client.SimpleTextChatModMenuApiImpl"
 		]
 	},
-	"mixins": [
-		"text_chat.mixins.json",
-		{
-			"config": "text_chat.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
 		"fabricloader": ">=0.19.3",
 		"minecraft": "~26.1.2",

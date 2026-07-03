@@ -38,7 +38,7 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-    implementation "com.alphacephei:vosk:0.3.45"
+    include implementation("com.alphacephei:vosk:0.3.45")
 
     implementation("com.terraformersmc:modmenu:${project.modmenu_version}")
 }
