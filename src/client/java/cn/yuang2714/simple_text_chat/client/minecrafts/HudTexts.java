@@ -2,6 +2,7 @@ package cn.yuang2714.simple_text_chat.client.minecrafts;
 
 import cn.yuang2714.simple_text_chat.client.SimpleTextChatClient;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -9,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
 public class HudTexts implements HudElement {
-    public volatile static Component text = VersionDifferences.translatable("hud.text_chat.status.disabled");
+    public volatile static Component text = VersionDifferences.translatable("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
     
     public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, @NonNull DeltaTracker tracker) {
         if (SimpleTextChatClient.isDisabled) return;

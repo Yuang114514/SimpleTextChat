@@ -1,6 +1,5 @@
 package cn.yuang2714.simple_text_chat.client.minecrafts;
 
-import cn.yuang2714.simple_text_chat.SimpleTextChat;
 import cn.yuang2714.simple_text_chat.client.core.RecognizationManager;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -52,15 +51,10 @@ public class KeyMappings {
         isEnabled = !isEnabled;
         
         if (isEnabled) {
-            try {
-                RecognizationManager.setup();
-            } catch (Exception e) {
-                SimpleTextChat.LOGGER.error("Failed to setup RecognitionManager.", e);
-                HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
-            }
+            RecognizationManager.setup();
         } else {
             RecognizationManager.INSTANCE.clean();
-            HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.disabled");
+            HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
         }
     }
     

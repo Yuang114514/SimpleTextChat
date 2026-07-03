@@ -69,17 +69,24 @@ public class RecognizationManager extends Thread {
         
         setName("Recognization Manager Thread");
         
-        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.ready");
+        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.ready").withStyle(ChatFormatting.GREEN);
         LOGGER.info("Recognization Manager Started. Mode: {}", mode);
     }
     
-    public static void setup() throws Exception {
+    public static void setup() {
         if (SimpleTextChatClient.isDisabled) return;
         
-        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.preparing");
+        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.preparing").withStyle(ChatFormatting.GREEN);
         
-        INSTANCE = new RecognizationManager();
-        INSTANCE.start();
+        new Thread(() -> {
+            try {
+                INSTANCE = new RecognizationManager();
+            } catch (Exception e) {
+                LOGGER.error("Failed to initialize Recognization Manager.", e);
+                HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
+            }
+            INSTANCE.start();
+        }, "Recognization Manager Initializer").start();
     }
 
     @SuppressWarnings("BusyWait")
@@ -99,17 +106,12 @@ public class RecognizationManager extends Thread {
             LOGGER.debug("Processing interval for mode: {}", mode);
             
             try {
-                Thread.sleep(500);
+                Thread.sleep(250);
             } catch (InterruptedException _) {}
         }
     }
     
     private void commonInterval() {
-        if (cancelKey.isConsumable()) {
-            result = "";
-            cancelKey.consume();
-        }
-        
         if (partialResult == null || partialResult.isEmpty()) {
             partialResult = " ";
         }
@@ -163,6 +165,12 @@ public class RecognizationManager extends Thread {
     }
     
     private void sendPlayerChat(String message) {
+        if (message == null || message.isBlank()) return;
+        if (cancelKey.isConsumable()) {
+            cancelKey.consume();
+            return;
+        }
+        
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         if (localPlayer != null) {
             localPlayer.connection.sendChat(message);
