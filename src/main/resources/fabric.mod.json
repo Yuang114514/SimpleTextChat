@@ -3,7 +3,7 @@
 	"id": "text_chat",
 	"version": "${version}",
 	"name": "Simple Text Chat",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "A simple mod that allows you to chat with voices while playing by recognize your voice to chat messages.",
 	"authors": [
 		"Yuang2714"
 	],

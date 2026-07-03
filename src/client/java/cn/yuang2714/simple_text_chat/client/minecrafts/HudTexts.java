@@ -1,5 +1,6 @@
 package cn.yuang2714.simple_text_chat.client.minecrafts;
 
+import cn.yuang2714.simple_text_chat.client.SimpleTextChatClient;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -10,12 +11,14 @@ import org.jspecify.annotations.NonNull;
 public class HudTexts implements HudElement {
     public volatile static Component text = VersionDifferences.translatable("hud.text_chat.status.disabled");
     
-    public void extractRenderState(GuiGraphicsExtractor graphics, @NonNull DeltaTracker tracker) {
+    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, @NonNull DeltaTracker tracker) {
+        if (SimpleTextChatClient.isDisabled) return;
+        
         Minecraft mc = Minecraft.getInstance();
         
         int textWidth = mc.font.width(text);
         int textX = (graphics.guiWidth() - textWidth) - 2;
-        int textY = (graphics.guiHeight() / 2 - mc.font.lineHeight / 2) - 2;
+        int textY = graphics.guiHeight() - 26;
         
         graphics.fill(
                 textX - 2,

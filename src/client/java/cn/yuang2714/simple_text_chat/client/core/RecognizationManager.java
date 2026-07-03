@@ -2,6 +2,7 @@ package cn.yuang2714.simple_text_chat.client.core;
 
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
 import cn.yuang2714.simple_text_chat.client.Config;
+import cn.yuang2714.simple_text_chat.client.SimpleTextChatClient;
 import cn.yuang2714.simple_text_chat.client.minecrafts.HudTexts;
 import cn.yuang2714.simple_text_chat.client.minecrafts.VersionDifferences;
 import com.google.gson.JsonObject;
@@ -16,7 +17,7 @@ import javax.sound.sampled.*;
 
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
-public class RecognizationManager extends Thread{
+public class RecognizationManager extends Thread {
     public static RecognizationManager INSTANCE;
     
     private final Model model;
@@ -57,7 +58,7 @@ public class RecognizationManager extends Thread{
         LOGGER.info("Initializing Recognization Manager.");
         
         model = new Model(Config.getModelStorageFolder().toString());
-        recognizer = new Recognizer(model, 16000.0f);
+        recognizer = new Recognizer(model, 16000.0f, ModelDictionary.get());
         mode = Config.getMode();
         
         Thread recognizationThread = new Thread(this::recognize);
@@ -73,6 +74,8 @@ public class RecognizationManager extends Thread{
     }
     
     public static void setup() throws Exception {
+        if (SimpleTextChatClient.isDisabled) return;
+        
         HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.preparing");
         
         INSTANCE = new RecognizationManager();
