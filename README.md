@@ -41,7 +41,6 @@ sequenceDiagram
     c -->> b: Return Config
     Note over b,c: Configs: Model Path, Mode
     Note over b: Setup Model
-    Note over b: Start Recognization
     
     loop Main Loop
         Note over b: Start Recognization

@@ -13,6 +13,10 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
     mavenCentral()
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
 }
 
 loom {
@@ -35,6 +39,8 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
     implementation "com.alphacephei:vosk:0.3.45"
+
+    implementation("com.terraformersmc:modmenu:${project.modmenu_version}")
 }
 
 processResources {
