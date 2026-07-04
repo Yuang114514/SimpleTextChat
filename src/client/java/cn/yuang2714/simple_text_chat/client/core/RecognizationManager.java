@@ -31,6 +31,7 @@ public class RecognizationManager extends Thread {
     private volatile String partialResult;
     private volatile String result;
     private volatile boolean isFinished = false;
+    private boolean hasCursed = false;
     
     public static class PressEvent {
         private volatile boolean hasEvent = false;
@@ -106,7 +107,7 @@ public class RecognizationManager extends Thread {
             LOGGER.debug("Processing interval for mode: {}", mode);
             
             try {
-                Thread.sleep(250);
+                Thread.sleep(500);
             } catch (InterruptedException _) {}
         }
     }
@@ -116,9 +117,17 @@ public class RecognizationManager extends Thread {
             partialResult = " ";
         }
         
+        addCursor();
+        
         HudTexts.text = VersionDifferences.literal(partialResult);
         
         LOGGER.debug("Synchronized Partial Result ‘{}’ to HUD.", partialResult);
+    }
+    
+    private synchronized void addCursor() {
+        if (hasCursed) partialResult += "_";
+        else partialResult += " ";
+        hasCursed = ! hasCursed;
     }
     
     private void intervalInAutoDetectMode() {

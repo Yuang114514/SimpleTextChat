@@ -1,7 +1,7 @@
 package cn.yuang2714.simple_text_chat.client.core;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
@@ -17,7 +17,7 @@ public class FileUtils {
     
     public static void write(String text, File file) throws Exception {
         try (FileOutputStream stream = new FileOutputStream(file)) {
-            stream.write(text.getBytes(StandardCharsets.UTF_8));
+            stream.write(text.getBytes(Charset.defaultCharset()));
         } catch (IOException e) {
             LOGGER.error("Failed to write file {}", file, e);
             throw e;
