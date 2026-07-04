@@ -47,10 +47,10 @@ public class SetUpScreen extends Screen {
                 VersionDifferences.translatable("gui.text_chat.setup.model.info")
         );
         modelPath.setMaxLength(Integer.MAX_VALUE);
-        
         try {
             if (Config.isSetup()) modelPath.setValue(Config.getModelStorageFolder().toString());
         } catch (Exception _) {}
+        modelPath.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.model_path.tooltip")));
         
         addRenderableWidget(modelPath);
         
@@ -103,14 +103,14 @@ public class SetUpScreen extends Screen {
     public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         super.extractRenderState(graphics, mouseX, mouseY, a);
         
-        //DEBUG: 原点
-        graphics.fill(
-                START_X,
-                START_Y,
-                START_X + 1,
-                START_Y + 1,
-                0xFF_FF_00_00
-        );
+//        //DEBUG: 原点
+//        graphics.fill(
+//                START_X,
+//                START_Y,
+//                START_X + 1,
+//                START_Y + 1,
+//                0xFF_FF_00_00
+//        );
         
         graphics.text(
                 font,
@@ -183,27 +183,31 @@ public class SetUpScreen extends Screen {
     }
     
     public void verify(Button button) {
-        Path modelFolder;
-        try {
-            modelFolder = Paths.get(modelPath.getValue());
-            Model model = new Model(modelPath.getValue());
-            model.close();
-        } catch (IOException e) {
-            LOGGER.warn("User entered an invalid path", e);
-            button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.error.invalid_path").withStyle(ChatFormatting.RED));
-            return;
-        }
+        button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.ing"));
         
-        try {
-            Config.setModelStorageFolder(modelFolder);
-            Config.setMode(modes.getValue());
-            Config.setSetup(true);
-        } catch (Exception e) {
-            LOGGER.warn("Failed to store into config.", e);
-            button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.error.failed_to_config").withStyle(ChatFormatting.RED));
-            return;
-        }
-        
-        minecraft.setScreen(parentScreen);
+        new Thread(() -> {
+            Path modelFolder;
+            try {
+                modelFolder = Paths.get(modelPath.getValue());
+                Model model = new Model(modelPath.getValue());
+                model.close();
+            } catch (IOException e) {
+                LOGGER.warn("User entered an invalid path", e);
+                button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.error.invalid_path").withStyle(ChatFormatting.RED));
+                return;
+            }
+            
+            try {
+                Config.setModelStorageFolder(modelFolder);
+                Config.setMode(modes.getValue());
+                Config.setSetup(true);
+            } catch (Exception e) {
+                LOGGER.warn("Failed to store into config.", e);
+                button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.error.failed_to_config").withStyle(ChatFormatting.RED));
+                return;
+            }
+            
+            minecraft.setScreen(parentScreen);
+        }, "Model Verifier").start();
     }
 }
