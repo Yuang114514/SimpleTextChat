@@ -26,10 +26,27 @@ public class SetUpScreen extends Screen {
     private final Screen parentScreen;
     private EditBox modelPath;
     private CycleButton<Config.Mode> modes;
+    private Button verify;
+    private Button saveAndExit;
+    private final String lastModelPath;
+    private final Config.Mode lastMode;
+    private boolean isVerified = true;
     
     public SetUpScreen(Screen parentScreen) {
         super(VersionDifferences.translatable("gui.text_chat.setup.title"));
         this.parentScreen = parentScreen;
+        
+        Config.Mode cfgMode;
+        String cfgModelPath;
+        try {
+            cfgModelPath = Config.getModelStorageFolder().toAbsolutePath().toString();
+            cfgMode = Config.getMode();
+        } catch (Exception _) {
+            cfgModelPath = "";
+            cfgMode = Config.Mode.AUTO_DETECT;
+        }
+        lastMode = cfgMode;
+        lastModelPath = cfgModelPath;
     }
     
     @Override
@@ -47,10 +64,12 @@ public class SetUpScreen extends Screen {
                 VersionDifferences.translatable("gui.text_chat.setup.model.info")
         );
         modelPath.setMaxLength(Integer.MAX_VALUE);
-        try {
-            if (Config.isSetup()) modelPath.setValue(Config.getModelStorageFolder().toString());
-        } catch (Exception _) {}
+        modelPath.setValue(lastModelPath);
         modelPath.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.model_path.tooltip")));
+        modelPath.setResponder(s -> {
+            isVerified = s.equals(lastModelPath);
+            verify.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify"));
+        });
         
         addRenderableWidget(modelPath);
         
@@ -70,7 +89,7 @@ public class SetUpScreen extends Screen {
         
         modes = CycleButton.builder(
                 mode -> mode.getName().setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(mode.getTooltip()))),
-                Config.Mode.AUTO_DETECT
+                lastMode
         ).withValues(
                 Config.Mode.values()
         ).create(
@@ -84,7 +103,7 @@ public class SetUpScreen extends Screen {
         modes.setTooltip(Tooltip.create(Config.Mode.AUTO_DETECT.getTooltip()));
         addRenderableWidget(modes);
         
-        addRenderableWidget(
+        verify = addRenderableWidget(
                 Button.builder(
                         VersionDifferences.translatable("gui.text_chat.setup.verify"),
                         this::verify
@@ -93,10 +112,39 @@ public class SetUpScreen extends Screen {
                 ).bounds(
                         START_X,
                         START_Y + 120,
-                        400,
+                        198,
                         20
                 ).build()
         );
+        
+        saveAndExit = addRenderableWidget(
+                Button.builder(
+                        VersionDifferences.translatable("gui.text_chat.setup.complete"),
+                        this::saveAndExit
+                ).tooltip(
+                        Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.complete.tooltip"))
+                ).bounds(
+                        START_X + 200,
+                        START_Y + 120,
+                        198,
+                        20
+                ).build()
+        );
+    }
+    
+    @Override
+    public void tick() {
+        if (isVerified) {
+            verify.active = false;
+            verify.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.verify.noneed")));
+            saveAndExit.active = true;
+            saveAndExit.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.complete.tooltip")));
+        } else {
+            verify.active = true;
+            verify.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.verify.tooltip")));
+            saveAndExit.active = false;
+            saveAndExit.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.complete.tooltip.need_verify")));
+        }
     }
     
     @Override
@@ -182,32 +230,34 @@ public class SetUpScreen extends Screen {
         minecraft.setScreen(parentScreen);
     }
     
-    public void verify(Button button) {
+    private void verify(Button button) {
         button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.ing"));
         
-        new Thread(() -> {
-            Path modelFolder;
-            try {
-                modelFolder = Paths.get(modelPath.getValue());
-                Model model = new Model(modelPath.getValue());
-                model.close();
-            } catch (IOException e) {
-                LOGGER.warn("User entered an invalid path", e);
-                button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.error.invalid_path").withStyle(ChatFormatting.RED));
-                return;
-            }
-            
-            try {
-                Config.setModelStorageFolder(modelFolder);
-                Config.setMode(modes.getValue());
-                Config.setSetup(true);
-            } catch (Exception e) {
-                LOGGER.warn("Failed to store into config.", e);
-                button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.error.failed_to_config").withStyle(ChatFormatting.RED));
-                return;
-            }
-            
-            minecraft.setScreen(parentScreen);
-        }, "Model Verifier").start();
+        try {
+            Model model = new Model(modelPath.getValue());
+            model.close();
+        } catch (IOException e) {
+            isVerified = false;
+            LOGGER.warn("User entered an invalid path", e);
+            button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.error.invalid_path").withStyle(ChatFormatting.RED));
+            return;
+        }
+        
+        isVerified = true;
+        button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.complete"));
+    }
+    
+    private void saveAndExit(Button button) {
+        try {
+            Config.setSetup(true);
+            Config.setMode(modes.getValue());
+            Config.setModelStorageFolder(Paths.get(modelPath.getValue()));
+        } catch (Exception e) {
+            LOGGER.error("Failed to storage into Config.", e);
+            button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.complete.error.failed_to_config"));
+            return;
+        }
+        
+        minecraft.setScreen(parentScreen);
     }
 }

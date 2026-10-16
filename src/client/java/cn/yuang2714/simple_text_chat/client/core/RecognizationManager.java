@@ -33,7 +33,7 @@ public class RecognizationManager extends Thread {
     private volatile boolean isFinished = false;
     private boolean hasCursed = false;
     
-    public static class PressEvent {
+    public static class PressKey {
         private volatile boolean hasEvent = false;
         
         public void submit() {
@@ -48,10 +48,10 @@ public class RecognizationManager extends Thread {
             hasEvent = false;
         }
         
-        public PressEvent() {}
+        public PressKey() {}
     }
-    public static volatile PressEvent functionKey = new PressEvent();
-    public static volatile PressEvent cancelKey = new PressEvent();
+    public static volatile PressKey functionKey = new PressKey();
+    public static volatile PressKey cancelKey = new PressKey();
     
     public RecognizationManager() throws Exception {
         super();
