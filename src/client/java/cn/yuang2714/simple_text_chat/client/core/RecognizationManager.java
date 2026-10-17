@@ -18,40 +18,25 @@ import javax.sound.sampled.*;
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
 public class RecognizationManager extends Thread {
-    public static RecognizationManager INSTANCE;
+    public static volatile RecognizationManager INSTANCE;
+    public static volatile boolean isEnabled = false;
+    private static volatile boolean hasActiveInitializer = false;
     
     private final Model model;
     private final Recognizer recognizer;
     private final Config.Mode mode;
+    private final String modelName;
     
     private static final AudioFormat audioFormat = new AudioFormat(16000.0f, 16, 1, true, false);
     private static final DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
     
-    private short recordingStatus = 1; //1 代表正在录音，2 代表录音完成等待发送，3 代表等待下一次录音
+    private volatile boolean isRecording = true;
     private volatile String partialResult;
     private volatile String result;
     private volatile boolean isFinished = false;
     private boolean hasCursed = false;
-    
-    public static class PressKey {
-        private volatile boolean hasEvent = false;
-        
-        public void submit() {
-            hasEvent = true;
-        }
-        
-        public boolean isConsumable() {
-            return hasEvent;
-        }
-        
-        public void consume() {
-            hasEvent = false;
-        }
-        
-        public PressKey() {}
-    }
-    public static volatile PressKey functionKey = new PressKey();
-    public static volatile PressKey cancelKey = new PressKey();
+    private volatile boolean needCancel = false;
+    private final Thread recognizationThread;
     
     public RecognizationManager() throws Exception {
         super();
@@ -61,12 +46,13 @@ public class RecognizationManager extends Thread {
         model = new Model(Config.getModelStorageFolder().toString());
         recognizer = new Recognizer(model, 16000.0f);
         mode = Config.getMode();
+        modelName = Config.getModelStorageFolder().getFileName().toString();
         
-        Thread recognizationThread = new Thread(this::recognize);
+        recognizationThread = new Thread(this::recognize);
         recognizationThread.setName("Audio Recognization Thread");
         recognizationThread.start();
         
-        if (mode == Config.Mode.HOLD_TO_SPEAK) recordingStatus = 3;
+        if (mode == Config.Mode.HOLD_TO_SPEAK) isRecording = false;
         
         setName("Recognization Manager Thread");
         
@@ -75,9 +61,18 @@ public class RecognizationManager extends Thread {
     }
     
     public static void setup() {
-        if (SimpleTextChatClient.isDisabled) return;
+        if (SimpleTextChatClient.isDisabled || INSTANCE != null || hasActiveInitializer) return;
+        hasActiveInitializer = true;
         
-        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.preparing").withStyle(ChatFormatting.GREEN);
+        String model = "ERROR";
+        try {
+            model = Config.getModelStorageFolder().getFileName().toString();
+        } catch (Exception e) {
+            LOGGER.error("Failed to initialize Recognization Manager.", e);
+            HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
+        }
+        
+        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.preparing", model).withStyle(ChatFormatting.GREEN);
         
         new Thread(() -> {
             try {
@@ -85,8 +80,18 @@ public class RecognizationManager extends Thread {
             } catch (Exception e) {
                 LOGGER.error("Failed to initialize Recognization Manager.", e);
                 HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
+                hasActiveInitializer = false;
+                return;
             }
+            
+            if (!isEnabled) {
+                INSTANCE.clean();
+                hasActiveInitializer = false;
+                return;
+            }
+            
             INSTANCE.start();
+            hasActiveInitializer = false;
         }, "Recognization Manager Initializer").start();
     }
 
@@ -98,11 +103,7 @@ public class RecognizationManager extends Thread {
                 return;
             }
             
-            switch (mode) {
-                case AUTO_DETECT -> intervalInAutoDetectMode();
-                case PRESS_SEND -> intervalInPressSendMode();
-                case HOLD_TO_SPEAK -> intervalInHoldToSpeakMode();
-            }
+            interval();
             
             LOGGER.debug("Processing interval for mode: {}", mode);
             
@@ -112,62 +113,79 @@ public class RecognizationManager extends Thread {
         }
     }
     
-    private void commonInterval() {
+    private void interval() {
         if (partialResult == null || partialResult.isEmpty()) {
             partialResult = " ";
         }
         
-        addCursor();
-        
-        HudTexts.text = VersionDifferences.literal(partialResult);
+        HudTexts.text = VersionDifferences.translatable(
+                "hud.text_chat.status.rec_msg",
+                (
+                        isRecording
+                        ? VersionDifferences.translatable("hud.text_chat.status.ing", addCursor(partialResult))
+                        : VersionDifferences.translatable("hud.text_chat.status.ready")
+                ),
+                modelName
+        );
         
         LOGGER.debug("Synchronized Partial Result ‘{}’ to HUD.", partialResult);
     }
     
-    private synchronized void addCursor() {
-        if (hasCursed) partialResult += "_";
-        else partialResult += " ";
-        hasCursed = ! hasCursed;
-    }
-    
-    private void intervalInAutoDetectMode() {
-        commonInterval();
-        if (result != null) {
-            sendPlayerChat(result);
-            result = null;
-        }
-    }
-    
-    private void intervalInPressSendMode() {
-        commonInterval();
-        if (functionKey.isConsumable()) {
-            sendPlayerChat(selectResult());
-            functionKey.consume();
-        }
-    }
-    
-    private void intervalInHoldToSpeakMode() {
-        commonInterval();
-        if (functionKey.isConsumable()) {
-            if (recordingStatus == 3) {
-                recordingStatus = 1;
-            } else if (recordingStatus == 1) {
-                recordingStatus = 2;
-            }
-            functionKey.consume();
-        }
+    private String addCursor(String s) {
+        if (hasCursed) s += "|";
         
-        if (recordingStatus == 2) {
-            sendPlayerChat(selectResult());
-            recordingStatus = 3;
+        hasCursed = !hasCursed;
+        
+        return s;
+    }
+    
+    public static void onFunctionKeyClick() {
+        if (INSTANCE == null) return;
+        
+        INSTANCE.onFunctionKeyClickInternal();
+    }
+    
+    private void onFunctionKeyClickInternal() {
+        switch (mode) {
+            case AUTO_DETECT -> {}
+            case PRESS_SEND -> sendPlayerChat(selectResult());
+            case HOLD_TO_SPEAK -> {
+                if (isRecording) {
+                    sendPlayerChat(selectResult());
+                    partialResult = "";
+                    result = "";
+                    isRecording = false;
+                } else {
+                    result = "";
+                    partialResult = "";
+                    isRecording = true;
+                }
+            }
+        }
+    }
+    
+    public static void onCancelKeyClick() {
+        if (INSTANCE == null) return;
+        
+        INSTANCE.needCancel = true;
+    }
+    
+    public static synchronized void featureToggleAction() {
+        isEnabled = !isEnabled;
+        
+        if (isEnabled) {
+            RecognizationManager.setup();
+        } else {
+            if (RecognizationManager.INSTANCE != null) RecognizationManager.INSTANCE.clean();
+            HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
         }
     }
     
     private String selectResult() {
-        if (!partialResult.equals(" ")) {
-            return partialResult;
-        } else if (result != null && !result.isEmpty()) {
+        if (result != null && !result.isEmpty()) {
             return result;
+        } else if (partialResult != null && !partialResult.equals(" ")) {
+            return partialResult;
         } else {
             return " ";
         }
@@ -175,15 +193,17 @@ public class RecognizationManager extends Thread {
     
     private void sendPlayerChat(String message) {
         if (message == null || message.isBlank() || message.equals("我")) return;
-        if (cancelKey.isConsumable()) {
-            cancelKey.consume();
+        if (needCancel) {
+            needCancel = false;
             return;
         }
         
-        LocalPlayer localPlayer = Minecraft.getInstance().player;
-        if (localPlayer != null) {
-            localPlayer.connection.sendChat(message);
-        } else LOGGER.warn("Unable to get LocalPlayer.");
+        Minecraft.getInstance().execute(() -> {
+            LocalPlayer localPlayer = Minecraft.getInstance().player;
+            if (localPlayer != null) {
+                localPlayer.connection.sendChat(message);
+            } else LOGGER.warn("Unable to get LocalPlayer.");
+        });
     }
     
     public void clean() {
@@ -191,11 +211,17 @@ public class RecognizationManager extends Thread {
         isFinished = true;
         HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.disabled");
         
+        try {
+            recognizationThread.join();
+            if (Thread.currentThread() != this || getState() != State.NEW) join();
+        } catch (InterruptedException _) {}
+        
         LOGGER.info("Recognization Manager cleaned.");
 
         INSTANCE = null;
     }
     
+    @SuppressWarnings("BusyWait")
     private void recognize() {
         try (TargetDataLine line = (TargetDataLine) AudioSystem.getLine(info)) {
             line.open(audioFormat);
@@ -203,27 +229,40 @@ public class RecognizationManager extends Thread {
             
             byte[] buffer = new byte[4096];
             while (true) {
-                if (isFinished) {
-                    recognizer.close();
-                    model.close();
-                    LOGGER.info("Finished Recognization Manager.");
-                    return;
+                if (isFinished) return;
+                if (!isRecording) {
+                    try { Thread.sleep(100); } catch (InterruptedException _) {}
+                    continue;
                 }
-                if (recordingStatus != 1) continue;
                 
                 LOGGER.debug("Writing {} bytes into Recognizer.", buffer.length);
                 int bytesRead = line.read(buffer, 0, buffer.length);
                 if (bytesRead > 0) {
-                    if (recognizer.acceptWaveForm(buffer, bytesRead)) {
-                        result = processVoskResult(recognizer.getResult());
+                    boolean isFinal = recognizer.acceptWaveForm(buffer, bytesRead);
+                    if (mode != Config.Mode.HOLD_TO_SPEAK) {
+                        if (isFinal) {
+                            result = processVoskResult(recognizer.getResult());
+                            if (mode == Config.Mode.AUTO_DETECT) sendPlayerChat(result);
+                        } else {
+                            partialResult = processVoskResult(recognizer.getPartialResult());
+                        }
                     } else {
-                        partialResult = processVoskResult(recognizer.getPartialResult());
+                        if (isFinal) {
+                            String lastResult = result;
+                            result = (lastResult == null ? "" : lastResult) + processVoskResult(recognizer.getResult());
+                        } else {
+                            partialResult = processVoskResult(recognizer.getPartialResult());
+                        }
                     }
                 }
             }
         } catch (LineUnavailableException e) {
             SimpleTextChat.LOGGER.error("Audio line not available.", e);
             HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.line_unavailable").withStyle(ChatFormatting.RED);
+        } finally {
+            recognizer.close();
+            model.close();
+            LOGGER.info("Finished Recognization Manager.");
         }
     }
     

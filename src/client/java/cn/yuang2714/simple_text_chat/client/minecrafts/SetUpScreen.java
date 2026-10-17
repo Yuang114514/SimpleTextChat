@@ -15,7 +15,6 @@ import org.jspecify.annotations.NonNull;
 import org.vosk.Model;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
@@ -28,7 +27,7 @@ public class SetUpScreen extends Screen {
     private CycleButton<Config.Mode> modes;
     private Button verify;
     private Button saveAndExit;
-    private final String lastModelPath;
+    private String lastModelPath;
     private final Config.Mode lastMode;
     private boolean isVerified = true;
     
@@ -244,6 +243,7 @@ public class SetUpScreen extends Screen {
         }
         
         isVerified = true;
+        lastModelPath = modelPath.getValue();
         button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify.complete"));
     }
     

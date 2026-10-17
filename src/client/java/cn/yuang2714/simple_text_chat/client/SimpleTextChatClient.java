@@ -37,9 +37,11 @@ public class SimpleTextChatClient implements ClientModInitializer {
             if (isDisabled) return;
             
             if (featureToggleKey.consumeClick())
-                KeyMappings.featureToggleAction();
-            if (speechDoneKey.consumeClick()) KeyMappings.speechDoneAction();
-            if (speechCancelKey.consumeClick()) KeyMappings.speechCancelAction();
+                RecognizationManager.featureToggleAction();
+            if (speechDoneKey.consumeClick())
+                RecognizationManager.onFunctionKeyClick();
+            if (speechCancelKey.consumeClick())
+                RecognizationManager.onCancelKeyClick();
         });
         
         ScreenEvents.AFTER_INIT.register((minecraft, screen, _, _) -> {
