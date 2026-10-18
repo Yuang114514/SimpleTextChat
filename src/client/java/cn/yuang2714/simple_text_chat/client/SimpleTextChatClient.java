@@ -1,6 +1,7 @@
 package cn.yuang2714.simple_text_chat.client;
 
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
+import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.core.RecognizationManager;
 import cn.yuang2714.simple_text_chat.client.minecrafts.HudTexts;
 import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;

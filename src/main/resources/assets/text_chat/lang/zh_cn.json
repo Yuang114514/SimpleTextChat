@@ -43,12 +43,12 @@
 	"enum.text_chat.modes.auto_detect.tooltip": "持续识别，在检测到句子结束时自动发送",
 
 	"hud.text_chat.status.disabled": "简单的文本聊天 未启用",
-	"hud.text_chat.status.preparing": "准备中... | 模型：%s",
+	"hud.text_chat.status.preparing": "准备中... | 模型：%s | 模式：%s",
 	"hud.text_chat.status.ready": "识别就绪",
 	"hud.text_chat.status.closing": "关闭中...",
 	"hud.text_chat.status.setup_failed": "初始化识别器失败",
 	"hud.text_chat.status.line_unavailable": "音频输入流不可用",
-	"hud.text_chat.status.rec_msg": "%s | 模型：%s",
+	"hud.text_chat.status.rec_msg": "%s | 模型：%s | 模式：%s",
 	"hud.text_chat.status.ing": "识别中：%s",
 
 	"modmenu.nameTranslation.text_chat": "简单的文本聊天",

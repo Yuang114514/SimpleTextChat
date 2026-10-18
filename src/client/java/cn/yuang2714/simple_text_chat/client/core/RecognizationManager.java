@@ -1,8 +1,9 @@
 package cn.yuang2714.simple_text_chat.client.core;
 
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
-import cn.yuang2714.simple_text_chat.client.Config;
+import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.SimpleTextChatClient;
+import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
 import cn.yuang2714.simple_text_chat.client.minecrafts.HudTexts;
 import cn.yuang2714.simple_text_chat.client.minecrafts.VersionDifferences;
 import com.google.gson.JsonObject;
@@ -10,6 +11,7 @@ import com.google.gson.JsonParser;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import org.vosk.Model;
 import org.vosk.Recognizer;
 
@@ -24,7 +26,7 @@ public class RecognizationManager extends Thread {
     
     private final Model model;
     private final Recognizer recognizer;
-    private final Config.Mode mode;
+    private final RecognizationMode recognizationMode;
     private final String modelName;
     
     private static final AudioFormat audioFormat = new AudioFormat(16000.0f, 16, 1, true, false);
@@ -45,19 +47,19 @@ public class RecognizationManager extends Thread {
         
         model = new Model(Config.getModelStorageFolder().toString());
         recognizer = new Recognizer(model, 16000.0f);
-        mode = Config.getMode();
+        recognizationMode = Config.getMode();
         modelName = Config.getModelStorageFolder().getFileName().toString();
         
         recognizationThread = new Thread(this::recognize);
         recognizationThread.setName("Audio Recognization Thread");
         recognizationThread.start();
         
-        if (mode == Config.Mode.HOLD_TO_SPEAK) isRecording = false;
+        if (recognizationMode == RecognizationMode.HOLD_TO_SPEAK) isRecording = false;
         
         setName("Recognization Manager Thread");
         
         HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.ready").withStyle(ChatFormatting.GREEN);
-        LOGGER.info("Recognization Manager Started. Mode: {}", mode);
+        LOGGER.info("Recognization Manager Started. RecognizationMode: {}", recognizationMode);
     }
     
     public static void setup() {
@@ -65,14 +67,16 @@ public class RecognizationManager extends Thread {
         hasActiveInitializer = true;
         
         String model = "ERROR";
+        Component mode = VersionDifferences.translatable("ERROR");
         try {
             model = Config.getModelStorageFolder().getFileName().toString();
+            mode = Config.getMode().getName();
         } catch (Exception e) {
             LOGGER.error("Failed to initialize Recognization Manager.", e);
             HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
         }
         
-        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.preparing", model).withStyle(ChatFormatting.GREEN);
+        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.preparing", model, mode).withStyle(ChatFormatting.GREEN);
         
         new Thread(() -> {
             try {
@@ -105,7 +109,7 @@ public class RecognizationManager extends Thread {
             
             interval();
             
-            LOGGER.debug("Processing interval for mode: {}", mode);
+            LOGGER.debug("Processing interval for recognizationMode: {}", recognizationMode);
             
             try {
                 Thread.sleep(500);
@@ -125,7 +129,8 @@ public class RecognizationManager extends Thread {
                         ? VersionDifferences.translatable("hud.text_chat.status.ing", addCursor(partialResult))
                         : VersionDifferences.translatable("hud.text_chat.status.ready")
                 ),
-                modelName
+                modelName,
+                recognizationMode.getName()
         );
         
         LOGGER.debug("Synchronized Partial Result ‘{}’ to HUD.", partialResult);
@@ -146,7 +151,7 @@ public class RecognizationManager extends Thread {
     }
     
     private void onFunctionKeyClickInternal() {
-        switch (mode) {
+        switch (recognizationMode) {
             case AUTO_DETECT -> {}
             case PRESS_SEND -> sendPlayerChat(selectResult());
             case HOLD_TO_SPEAK -> {
@@ -239,10 +244,10 @@ public class RecognizationManager extends Thread {
                 int bytesRead = line.read(buffer, 0, buffer.length);
                 if (bytesRead > 0) {
                     boolean isFinal = recognizer.acceptWaveForm(buffer, bytesRead);
-                    if (mode != Config.Mode.HOLD_TO_SPEAK) {
+                    if (recognizationMode != RecognizationMode.HOLD_TO_SPEAK) {
                         if (isFinal) {
                             result = processVoskResult(recognizer.getResult());
-                            if (mode == Config.Mode.AUTO_DETECT) sendPlayerChat(result);
+                            if (recognizationMode == RecognizationMode.AUTO_DETECT) sendPlayerChat(result);
                         } else {
                             partialResult = processVoskResult(recognizer.getPartialResult());
                         }
