@@ -20,6 +20,8 @@
 	"gui.text_chat.setup.model.tooltip": "在点击按钮后，一个浏览器窗口会打开。在那里下载你想要的模型并解压到某处，然后把解压后的文件夹路径输入到左边的输入框中。",
 
 	"gui.text_chat.setup.mode.info": "工作模式",
+	"gui.text_chat.setup.lang.info": "模型语言",
+	"gui.text_chat.setup.lang.tooltip": "模型的目标语言。这会影响模组处理识别结果的方式。",
 
 	"gui.text_chat.setup.verify": "验证模型路径",
 	"gui.text_chat.setup.verify.noneed": "无需验证。",
@@ -35,12 +37,13 @@
 
 	"enum.text_chat.modes.hold_to_speak": "切换说话",
 	"enum.text_chat.modes.hold_to_speak.tooltip": "按一下 功能键 开始说话，再按一下发送。",
-
 	"enum.text_chat.modes.press_send": "按键发送",
 	"enum.text_chat.modes.press_send.tooltip": "持续识别，在按下 功能键 时发送",
-
 	"enum.text_chat.modes.auto_detect": "自动识别",
 	"enum.text_chat.modes.auto_detect.tooltip": "持续识别，在检测到句子结束时自动发送",
+
+	"enum.text_chat.langs.chinese": "中文",
+	"enum.text_chat.langs.english": "英文",
 
 	"hud.text_chat.status.disabled": "简单的文本聊天 未启用",
 	"hud.text_chat.status.preparing": "准备中... | 模型：%s | 模式：%s",

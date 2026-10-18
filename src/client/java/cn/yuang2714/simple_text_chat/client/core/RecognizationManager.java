@@ -1,8 +1,9 @@
 package cn.yuang2714.simple_text_chat.client.core;
 
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
-import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.SimpleTextChatClient;
+import cn.yuang2714.simple_text_chat.client.config.Config;
+import cn.yuang2714.simple_text_chat.client.config.ModelLanguage;
 import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
 import cn.yuang2714.simple_text_chat.client.minecrafts.HudTexts;
 import cn.yuang2714.simple_text_chat.client.minecrafts.VersionDifferences;
@@ -27,6 +28,7 @@ public class RecognizationManager extends Thread {
     private final Model model;
     private final Recognizer recognizer;
     private final RecognizationMode recognizationMode;
+    private final ModelLanguage language;
     private final String modelName;
     
     private static final AudioFormat audioFormat = new AudioFormat(16000.0f, 16, 1, true, false);
@@ -48,6 +50,7 @@ public class RecognizationManager extends Thread {
         model = new Model(Config.getModelStorageFolder().toString());
         recognizer = new Recognizer(model, 16000.0f);
         recognizationMode = Config.getMode();
+        language = Config.getModelLanguage();
         modelName = Config.getModelStorageFolder().getFileName().toString();
         
         recognizationThread = new Thread(this::recognize);
@@ -207,7 +210,7 @@ public class RecognizationManager extends Thread {
     }
     
     private void sendPlayerChat(String message) {
-        if (message == null || message.isBlank() || message.equals("我")) return;
+        if (message == null || message.isBlank()) return;
         if (needCancel) {
             needCancel = false;
             return;
@@ -281,7 +284,7 @@ public class RecognizationManager extends Thread {
         }
     }
     
-    private static String processVoskResult(String result) {
+    private String processVoskResult(String result) {
         JsonObject resultAsJsonObject = JsonParser.parseString(result).getAsJsonObject();
         
         String temp;
@@ -293,6 +296,21 @@ public class RecognizationManager extends Thread {
             temp = "";
         }
         
-        return temp.replace(" ", "");
+        return switch (language) {
+            case CHINESE -> {
+                if (temp.equals("我")) yield "";
+                yield temp.replace(" ", "");
+            }
+            case ENGLISH -> {
+                if (temp.equals("the")) yield "";
+                yield capitalizeFirst(temp).replace(" i ", " I ");
+            }
+        };
+    }
+    
+    private static String capitalizeFirst(String s) {
+        if (s.isEmpty()) return "";
+        if (s.length() == 1) return s.toUpperCase();
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 }

@@ -3,9 +3,9 @@ package cn.yuang2714.simple_text_chat.client;
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
 import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.core.RecognizationManager;
+import cn.yuang2714.simple_text_chat.client.minecrafts.ConfigScreen;
 import cn.yuang2714.simple_text_chat.client.minecrafts.HudTexts;
 import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;
-import cn.yuang2714.simple_text_chat.client.minecrafts.SetUpScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
@@ -50,7 +50,7 @@ public class SimpleTextChatClient implements ClientModInitializer {
             
             try {
                 if (screen instanceof TitleScreen titleScreen && !Config.isSetup()) {
-                    minecraft.gui.setScreen(new SetUpScreen(titleScreen));
+                    minecraft.gui.setScreen(new ConfigScreen(titleScreen));
                 }
             } catch (Exception _) {}
         });

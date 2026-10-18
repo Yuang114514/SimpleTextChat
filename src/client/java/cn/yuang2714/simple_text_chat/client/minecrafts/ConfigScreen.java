@@ -1,6 +1,7 @@
 package cn.yuang2714.simple_text_chat.client.minecrafts;
 
 import cn.yuang2714.simple_text_chat.client.config.Config;
+import cn.yuang2714.simple_text_chat.client.config.ModelLanguage;
 import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -20,31 +21,37 @@ import java.nio.file.Paths;
 
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
-public class SetUpScreen extends Screen {
+public class ConfigScreen extends Screen {
     private int START_X;
     private int START_Y;
     private final Screen parentScreen;
     private EditBox modelPath;
     private CycleButton<RecognizationMode> modes;
+    private CycleButton<ModelLanguage> languages;
     private Button verify;
     private Button saveAndExit;
     private String lastModelPath;
     private final RecognizationMode lastRecognizationMode;
+    private final ModelLanguage lastModelLang;
     private boolean isVerified = true;
     
-    public SetUpScreen(Screen parentScreen) {
+    public ConfigScreen(Screen parentScreen) {
         super(VersionDifferences.translatable("gui.text_chat.setup.title"));
         this.parentScreen = parentScreen;
         
         RecognizationMode cfgRecognizationMode;
+        ModelLanguage cfgModelLang;
         String cfgModelPath;
         try {
+            cfgModelLang = Config.getModelLanguage();
             cfgModelPath = Config.getModelStorageFolder().toAbsolutePath().toString();
             cfgRecognizationMode = Config.getMode();
         } catch (Exception _) {
             cfgModelPath = "";
             cfgRecognizationMode = RecognizationMode.AUTO_DETECT;
+            cfgModelLang = ModelLanguage.CHINESE;
         }
+        lastModelLang = cfgModelLang;
         lastRecognizationMode = cfgRecognizationMode;
         lastModelPath = cfgModelPath;
     }
@@ -52,7 +59,7 @@ public class SetUpScreen extends Screen {
     @Override
     protected void init() {
         START_X = width / 2 - 400 / 2;
-        START_Y = height / 2 - 130 / 2;
+        START_Y = height / 2 - 150 / 2;
         
         int modelPathTextWidth = font.width(VersionDifferences.translatable("gui.text_chat.setup.model.info"));
         modelPath = new EditBox(
@@ -66,10 +73,7 @@ public class SetUpScreen extends Screen {
         modelPath.setMaxLength(Integer.MAX_VALUE);
         modelPath.setValue(lastModelPath);
         modelPath.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.model_path.tooltip")));
-        modelPath.setResponder(s -> {
-            isVerified = s.equals(lastModelPath);
-            verify.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify"));
-        });
+        modelPath.setResponder(this::onModelPathChange);
         
         addRenderableWidget(modelPath);
         
@@ -98,11 +102,29 @@ public class SetUpScreen extends Screen {
                 START_Y + 85,
                 400,
                 20,
-                VersionDifferences.translatable("gui.text_chat.setup.recognizationMode.info"),
-                (button, recognizationMode) -> button.setTooltip(Tooltip.create(recognizationMode.getTooltip()))
+                VersionDifferences.translatable("gui.text_chat.setup.mode.info"),
+                (button, recognizationMode) ->
+                        button.setTooltip(Tooltip.create(recognizationMode.getTooltip()))
         );
-        modes.setTooltip(Tooltip.create(RecognizationMode.AUTO_DETECT.getTooltip()));
+        modes.setTooltip(Tooltip.create(lastRecognizationMode.getTooltip()));
         addRenderableWidget(modes);
+        
+        languages = CycleButton.builder(
+                ModelLanguage::getName,
+                lastModelLang
+        ).withValues(
+                ModelLanguage.values()
+        ).create(
+                START_X,
+                START_Y + 110,
+                400,
+                20,
+                VersionDifferences.translatable("gui.text_chat.setup.lang.info"),
+                (button, _) ->
+                        button.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.lang.tooltip")))
+        );
+        languages.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.lang.tooltip")));
+        addRenderableWidget(languages);
         
         verify = addRenderableWidget(
                 Button.builder(
@@ -112,7 +134,7 @@ public class SetUpScreen extends Screen {
                         Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.verify.tooltip"))
                 ).bounds(
                         START_X,
-                        START_Y + 120,
+                        START_Y + 140,
                         198,
                         20
                 ).build()
@@ -126,7 +148,7 @@ public class SetUpScreen extends Screen {
                         Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.complete.tooltip"))
                 ).bounds(
                         START_X + 200,
-                        START_Y + 120,
+                        START_Y + 140,
                         198,
                         20
                 ).build()
@@ -254,6 +276,7 @@ public class SetUpScreen extends Screen {
             Config.setSetup(true);
             Config.setMode(modes.getValue());
             Config.setModelStorageFolder(Paths.get(modelPath.getValue()));
+            Config.setModelLanguage(languages.getValue());
         } catch (Exception e) {
             LOGGER.error("Failed to storage into Config.", e);
             button.setMessage(VersionDifferences.translatable("gui.text_chat.setup.complete.error.failed_to_config"));
@@ -261,5 +284,13 @@ public class SetUpScreen extends Screen {
         }
         
         minecraft.gui.setScreen(parentScreen);
+    }
+    
+    private void onModelPathChange(String s) {
+        isVerified = s.equals(lastModelPath);
+        verify.setMessage(VersionDifferences.translatable("gui.text_chat.setup.verify"));
+        
+        if (s.contains("cn")) languages.setValue(ModelLanguage.CHINESE);
+        else if (s.contains("en")) languages.setValue(ModelLanguage.ENGLISH);
     }
 }

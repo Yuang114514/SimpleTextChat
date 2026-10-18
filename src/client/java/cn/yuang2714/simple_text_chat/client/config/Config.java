@@ -12,12 +12,20 @@ import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
 public class Config {
     private static final File configFile = FabricLoader.getInstance().getConfigDir().resolve("simple_text_chat.json").toFile();
+    
+    private static final String defaultJson = """
+            {
+                "setup": false,
+                "recognizationMode":"AUTO_DETECT",
+                "modelLang":"ENGLISH"
+            }
+            """;
 
     public static void init() throws Exception {
         try {
             if (!configFile.exists()) {
                 if (configFile.createNewFile()) {
-                    FileUtils.write("{}", configFile);
+                    FileUtils.write(defaultJson, configFile);
                     LOGGER.info("Config file has been created.");
                 }
             }
@@ -73,6 +81,21 @@ public class Config {
         }
         
         content.addProperty("setup", setup);
+        FileUtils.write(content.toString(), configFile);
+    }
+    
+    public static ModelLanguage getModelLanguage() throws Exception {
+        return ModelLanguage.valueOf(JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("modelLang").getAsString());
+    }
+    
+    public static void setModelLanguage(ModelLanguage language) throws Exception {
+        JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
+        
+        if (content.has("modelLang")) {
+            content.remove("modelLang");
+        }
+        
+        content.addProperty("modelLang", language.toString());
         FileUtils.write(content.toString(), configFile);
     }
 }
