@@ -187,7 +187,7 @@ public class RecognizationManager extends Thread {
     }
     
     private String selectResult() {
-        if (mode == Config.Mode.AUTO_DETECT) {
+        if (recognizationMode == RecognizationMode.AUTO_DETECT) {
             if (result != null && ! result.isEmpty()) {
                 return result;
             } else if (partialResult != null && ! partialResult.equals(" ")) {
