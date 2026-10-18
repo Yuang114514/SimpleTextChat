@@ -182,12 +182,22 @@ public class RecognizationManager extends Thread {
     }
     
     private String selectResult() {
-        if (result != null && !result.isEmpty()) {
-            return result;
-        } else if (partialResult != null && !partialResult.equals(" ")) {
-            return partialResult;
+        if (mode == Config.Mode.AUTO_DETECT) {
+            if (result != null && ! result.isEmpty()) {
+                return result;
+            } else if (partialResult != null && ! partialResult.equals(" ")) {
+                return partialResult;
+            } else {
+                return " ";
+            }
         } else {
-            return " ";
+            if (partialResult != null && ! partialResult.isBlank() && ! partialResult.isEmpty()) {
+                return partialResult;
+            } else if (result != null && ! result.isBlank() && ! result.isEmpty()) {
+                return result;
+            } else {
+                return " ";
+            }
         }
     }
     

@@ -49,7 +49,7 @@ public class SimpleTextChatClient implements ClientModInitializer {
             
             try {
                 if (screen instanceof TitleScreen titleScreen && !Config.isSetup()) {
-                    minecraft.setScreen(new SetUpScreen(titleScreen));
+                    minecraft.gui.setScreen(new SetUpScreen(titleScreen));
                 }
             } catch (Exception _) {}
         });

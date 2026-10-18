@@ -226,7 +226,7 @@ public class SetUpScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
-        minecraft.setScreen(parentScreen);
+        minecraft.gui.setScreen(parentScreen);
     }
     
     private void verify(Button button) {
@@ -258,6 +258,6 @@ public class SetUpScreen extends Screen {
             return;
         }
         
-        minecraft.setScreen(parentScreen);
+        minecraft.gui.setScreen(parentScreen);
     }
 }
