@@ -20,6 +20,8 @@
     "gui.text_chat.setup.model.tooltip": "After clicking this button, a browser screen will open. Download models you like and extract them somewhere, then enter the folder path in the edit box left.",
 
     "gui.text_chat.setup.mode.info": "Working Mode",
+	"gui.text_chat.setup.lang.info": "Model Language",
+	"gui.text_chat.setup.lang.tooltip": "Target language of the model. It effects how this mod process result.",
 
     "gui.text_chat.setup.verify": "Verify",
 	"gui.text_chat.setup.verify.noneed": "No verifying needed.",
@@ -35,12 +37,13 @@
 
     "enum.text_chat.modes.hold_to_speak": "Toggle Key to Speak",
     "enum.text_chat.modes.hold_to_speak.tooltip": "Press the Function Key once to recognize, then press it again to send message.",
-
     "enum.text_chat.modes.press_send": "Press Key to Send",
     "enum.text_chat.modes.press_send.tooltip": "Recognize continuously, send message on pressing the Function Key.",
-
     "enum.text_chat.modes.auto_detect": "Automated Detect",
     "enum.text_chat.modes.auto_detect.tooltip": "Recognize continuously, send message when detect a sentence's end.",
+
+	"enum.text_chat.langs.chinese": "Chinese",
+	"enum.text_chat.langs.english": "English",
 
     "hud.text_chat.status.disabled": "Simple Text Chat Inactive",
     "hud.text_chat.status.preparing": "Preparing... | Model: %s | Mode: %s",
