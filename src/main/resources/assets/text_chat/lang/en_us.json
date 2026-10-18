@@ -43,12 +43,12 @@
     "enum.text_chat.modes.auto_detect.tooltip": "Recognize continuously, send message when detect a sentence's end.",
 
     "hud.text_chat.status.disabled": "Simple Text Chat Inactive",
-    "hud.text_chat.status.preparing": "Preparing... | Model: %s",
+    "hud.text_chat.status.preparing": "Preparing... | Model: %s | Mode: %s",
     "hud.text_chat.status.ready": "Recognization Ready",
     "hud.text_chat.status.closing": "Closing...",
     "hud.text_chat.status.setup_failed": "Failed to setup recognizer.",
     "hud.text_chat.status.line_unavailable": "Audio Line Unavaliable",
-	"hud.text_chat.status.rec_msg": "%s | Model: %s",
+	"hud.text_chat.status.rec_msg": "%s | Model: %s | Mode: %s",
 	"hud.text_chat.status.ing": "Recognizing：%s",
 
     "modmenu.nameTranslation.text_chat": "Simple Text Chat",

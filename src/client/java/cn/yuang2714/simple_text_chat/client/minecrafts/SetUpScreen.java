@@ -1,6 +1,7 @@
 package cn.yuang2714.simple_text_chat.client.minecrafts;
 
-import cn.yuang2714.simple_text_chat.client.Config;
+import cn.yuang2714.simple_text_chat.client.config.Config;
+import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -24,27 +25,27 @@ public class SetUpScreen extends Screen {
     private int START_Y;
     private final Screen parentScreen;
     private EditBox modelPath;
-    private CycleButton<Config.Mode> modes;
+    private CycleButton<RecognizationMode> modes;
     private Button verify;
     private Button saveAndExit;
     private String lastModelPath;
-    private final Config.Mode lastMode;
+    private final RecognizationMode lastRecognizationMode;
     private boolean isVerified = true;
     
     public SetUpScreen(Screen parentScreen) {
         super(VersionDifferences.translatable("gui.text_chat.setup.title"));
         this.parentScreen = parentScreen;
         
-        Config.Mode cfgMode;
+        RecognizationMode cfgRecognizationMode;
         String cfgModelPath;
         try {
             cfgModelPath = Config.getModelStorageFolder().toAbsolutePath().toString();
-            cfgMode = Config.getMode();
+            cfgRecognizationMode = Config.getMode();
         } catch (Exception _) {
             cfgModelPath = "";
-            cfgMode = Config.Mode.AUTO_DETECT;
+            cfgRecognizationMode = RecognizationMode.AUTO_DETECT;
         }
-        lastMode = cfgMode;
+        lastRecognizationMode = cfgRecognizationMode;
         lastModelPath = cfgModelPath;
     }
     
@@ -87,19 +88,20 @@ public class SetUpScreen extends Screen {
         );
         
         modes = CycleButton.builder(
-                mode -> mode.getName().setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(mode.getTooltip()))),
-                lastMode
+                recognizationMode -> recognizationMode.getName().setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(
+                        recognizationMode.getTooltip()))),
+                lastRecognizationMode
         ).withValues(
-                Config.Mode.values()
+                RecognizationMode.values()
         ).create(
                 START_X,
                 START_Y + 85,
                 400,
                 20,
-                VersionDifferences.translatable("gui.text_chat.setup.mode.info"),
-                (button, mode) -> button.setTooltip(Tooltip.create(mode.getTooltip()))
+                VersionDifferences.translatable("gui.text_chat.setup.recognizationMode.info"),
+                (button, recognizationMode) -> button.setTooltip(Tooltip.create(recognizationMode.getTooltip()))
         );
-        modes.setTooltip(Tooltip.create(Config.Mode.AUTO_DETECT.getTooltip()));
+        modes.setTooltip(Tooltip.create(RecognizationMode.AUTO_DETECT.getTooltip()));
         addRenderableWidget(modes);
         
         verify = addRenderableWidget(

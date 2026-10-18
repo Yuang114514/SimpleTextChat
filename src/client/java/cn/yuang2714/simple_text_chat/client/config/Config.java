@@ -1,11 +1,9 @@
-package cn.yuang2714.simple_text_chat.client;
+package cn.yuang2714.simple_text_chat.client.config;
 
 import cn.yuang2714.simple_text_chat.client.core.FileUtils;
-import cn.yuang2714.simple_text_chat.client.minecrafts.VersionDifferences;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.chat.MutableComponent;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -14,26 +12,6 @@ import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
 public class Config {
     private static final File configFile = FabricLoader.getInstance().getConfigDir().resolve("simple_text_chat.json").toFile();
-    
-    public enum Mode {
-        HOLD_TO_SPEAK("hold_to_speak"),
-        PRESS_SEND("press_send"),
-        AUTO_DETECT("auto_detect"),;
-        
-        public final String name;
-        
-        Mode(String name) {
-            this.name = name;
-        }
-        
-        public MutableComponent getName() {
-            return VersionDifferences.translatable("enum.text_chat.modes." + name);
-        }
-        
-        public MutableComponent getTooltip() {
-            return VersionDifferences.translatable("enum.text_chat.modes." + name + ".tooltip");
-        }
-    }
 
     public static void init() throws Exception {
         try {
@@ -64,18 +42,18 @@ public class Config {
         FileUtils.write(content.toString(), configFile);
     }
     
-    public static Mode getMode() throws Exception {
-        return Mode.valueOf(JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("mode").getAsString());
+    public static RecognizationMode getMode() throws Exception {
+        return RecognizationMode.valueOf(JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("recognizationMode").getAsString());
     }
     
-    public static void setMode(Mode mode) throws Exception {
+    public static void setMode(RecognizationMode recognizationMode) throws Exception {
         JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
         
-        if (content.has("mode")) {
-            content.remove("mode");
+        if (content.has("recognizationMode")) {
+            content.remove("recognizationMode");
         }
         
-        content.addProperty("mode", mode.toString());
+        content.addProperty("recognizationMode", recognizationMode.toString());
         FileUtils.write(content.toString(), configFile);
     }
     
