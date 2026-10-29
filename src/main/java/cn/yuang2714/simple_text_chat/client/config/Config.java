@@ -4,6 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class Config {
     public static Path getModelStorageFolder() {
@@ -38,6 +39,16 @@ public class Config {
         HOLDER.lang.set(language);
     }
     
+    public static Optional<String> getModelDictionary() {
+        String value = HOLDER.modelDictionary.get();
+        if (value.equals("[]")) return Optional.empty();
+        else return Optional.of(value);
+    }
+    
+    public static void setModelDictionary(String dictionary) {
+        HOLDER.modelDictionary.set(dictionary);
+    }
+    
     public static final Holder HOLDER;
     public static final ForgeConfigSpec CONFIG_SPEC;
     
@@ -54,6 +65,7 @@ public class Config {
         public final ForgeConfigSpec.EnumValue<RecognizationMode> mode;
         public final ForgeConfigSpec.BooleanValue isSetup;
         public final ForgeConfigSpec.EnumValue<ModelLanguage> lang;
+        public final ForgeConfigSpec.ConfigValue<String> modelDictionary;
         
         Holder(ForgeConfigSpec.Builder builder) {
             builder.comment("Configs for Simple Text Chat").push("Config");
@@ -73,6 +85,12 @@ public class Config {
             lang = builder
                     .comment("Recognization Language.")
                             .defineEnum("recognizationLanguage", ModelLanguage.CHINESE);
+            
+            modelDictionary = builder
+                    .comment("The dictionary of model, formatted in JSON List format.\n" +
+                                     "WARNING: If you use small models, it will REPLACE the result by dictionary," +
+                                     " and large models won't work with dictionary.")
+                            .define("modelDictionary", "[]");
             
             builder.pop();
         }
