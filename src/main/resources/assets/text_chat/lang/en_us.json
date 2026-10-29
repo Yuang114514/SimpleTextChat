@@ -5,7 +5,7 @@
     "text.text_chat.key_mappings.speech_done": "Function Key",
     "text.text_chat.key_mappings.speech_cancel": "Cancel Speech",
 
-    "gui.text_chat.setup.title": "Setup Simple Text Chat",
+    "gui.text_chat.setup.title": "Configure Simple Text Chat",
 
     "gui.text_chat.setup.description.line_1": "Welcome to Simple Text Chat, a simple mod that bring you talking-chatting experience!",
     "gui.text_chat.setup.description.line_2": "Here are some config to do now.",
