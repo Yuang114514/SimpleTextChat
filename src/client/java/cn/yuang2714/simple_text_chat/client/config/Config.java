@@ -7,6 +7,7 @@ import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
@@ -17,7 +18,8 @@ public class Config {
             {
                 "setup": false,
                 "recognizationMode":"AUTO_DETECT",
-                "modelLang":"ENGLISH"
+                "recognizationLanguage":"ENGLISH",
+                "modelDictionary":[]
             }
             """;
 
@@ -85,17 +87,23 @@ public class Config {
     }
     
     public static ModelLanguage getModelLanguage() throws Exception {
-        return ModelLanguage.valueOf(JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("modelLang").getAsString());
+        return ModelLanguage.valueOf(JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("recognizationLanguage").getAsString());
     }
     
     public static void setModelLanguage(ModelLanguage language) throws Exception {
         JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
         
-        if (content.has("modelLang")) {
-            content.remove("modelLang");
+        if (content.has("recognizationLanguage")) {
+            content.remove("recognizationLanguage");
         }
         
-        content.addProperty("modelLang", language.toString());
+        content.addProperty("recognizationLanguage", language.toString());
         FileUtils.write(content.toString(), configFile);
+    }
+    
+    public static Optional<String> getModelDictionary() throws Exception {
+        String value = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("modelDictionary").getAsJsonArray().toString();
+        if (value.equals("[]")) return Optional.empty();
+        else return Optional.of(value);
     }
 }
