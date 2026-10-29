@@ -18,6 +18,8 @@ import org.vosk.Recognizer;
 
 import javax.sound.sampled.*;
 
+import java.util.Optional;
+
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
 public class RecognizationManager extends Thread {
@@ -48,7 +50,12 @@ public class RecognizationManager extends Thread {
         LOGGER.info("Initializing Recognization Manager.");
         
         model = new Model(Config.getModelStorageFolder().toString());
-        recognizer = new Recognizer(model, 16000.0f);
+        
+        Optional<String> dictionary = Config.getModelDictionary();
+        recognizer = dictionary.isEmpty()
+                     ? new Recognizer(model, 16000.0f)
+                     : new Recognizer(model, 16000.0f, dictionary.get());
+        
         recognizationMode = Config.getMode();
         language = Config.getModelLanguage();
         modelName = Config.getModelStorageFolder().getFileName().toString();
