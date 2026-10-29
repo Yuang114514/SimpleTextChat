@@ -4,7 +4,7 @@ import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.config.ModelLanguage;
 import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
@@ -12,8 +12,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.Util;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.vosk.Model;
 
 import java.io.IOException;
@@ -42,15 +41,10 @@ public class ConfigScreen extends Screen {
         RecognizationMode cfgRecognizationMode;
         ModelLanguage cfgModelLang;
         String cfgModelPath;
-        try {
-            cfgModelLang = Config.getModelLanguage();
-            cfgModelPath = Config.getModelStorageFolder().toAbsolutePath().toString();
-            cfgRecognizationMode = Config.getMode();
-        } catch (Exception _) {
-            cfgModelPath = "";
-            cfgRecognizationMode = RecognizationMode.AUTO_DETECT;
-            cfgModelLang = ModelLanguage.CHINESE;
-        }
+        cfgModelLang = Config.getModelLanguage();
+        cfgModelPath = Config.getModelStorageFolder().toAbsolutePath().toString();
+        cfgRecognizationMode = Config.getMode();
+        
         lastModelLang = cfgModelLang;
         lastRecognizationMode = cfgRecognizationMode;
         lastModelPath = cfgModelPath;
@@ -80,7 +74,7 @@ public class ConfigScreen extends Screen {
         addRenderableWidget(
                 Button.builder(
                         VersionDifferences.translatable("gui.text_chat.setup.model.download_button_text"),
-                        _ -> Util.getPlatform().openUri("https://alphacephei.com/vosk/models")
+                        ignored -> VersionDifferences.openUri("https://alphacephei.com/vosk/models")
                 ).bounds(
                         START_X + 305,
                         START_Y + 60,
@@ -91,10 +85,14 @@ public class ConfigScreen extends Screen {
                 ).build()
         );
         
-        modes = CycleButton.builder(
-                recognizationMode -> recognizationMode.getName().setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(
-                        recognizationMode.getTooltip()))),
+        modes = CycleButton.<RecognizationMode>builder(
+                recognizationMode -> recognizationMode.getName().setStyle(Style.EMPTY.withHoverEvent(
+                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, recognizationMode.getTooltip())
+                ))
+        ).withInitialValue(
                 lastRecognizationMode
+        ).withTooltip(
+                (mode) -> Tooltip.create(mode.getTooltip())
         ).withValues(
                 RecognizationMode.values()
         ).create(
@@ -102,15 +100,15 @@ public class ConfigScreen extends Screen {
                 START_Y + 85,
                 400,
                 20,
-                VersionDifferences.translatable("gui.text_chat.setup.mode.info"),
-                (button, recognizationMode) ->
-                        button.setTooltip(Tooltip.create(recognizationMode.getTooltip()))
+                VersionDifferences.translatable("gui.text_chat.setup.mode.info")
         );
-        modes.setTooltip(Tooltip.create(lastRecognizationMode.getTooltip()));
         addRenderableWidget(modes);
         
         languages = CycleButton.builder(
-                ModelLanguage::getName,
+                ModelLanguage::getName
+        ).withTooltip(
+                (ignored) -> Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.lang.tooltip"))
+        ).withInitialValue(
                 lastModelLang
         ).withValues(
                 ModelLanguage.values()
@@ -119,11 +117,8 @@ public class ConfigScreen extends Screen {
                 START_Y + 110,
                 400,
                 20,
-                VersionDifferences.translatable("gui.text_chat.setup.lang.info"),
-                (button, _) ->
-                        button.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.lang.tooltip")))
+                VersionDifferences.translatable("gui.text_chat.setup.lang.info")
         );
-        languages.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.lang.tooltip")));
         addRenderableWidget(languages);
         
         verify = addRenderableWidget(
@@ -171,8 +166,10 @@ public class ConfigScreen extends Screen {
     }
     
     @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        super.extractRenderState(graphics, mouseX, mouseY, a);
+    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float a) {
+        renderBackground(graphics);
+        
+        super.render(graphics, mouseX, mouseY, a);
         
 //        //DEBUG: 原点
 //        graphics.fill(
@@ -183,7 +180,7 @@ public class ConfigScreen extends Screen {
 //                0xFF_FF_00_00
 //        );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.title"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.title")) / 2,
@@ -192,7 +189,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_1"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_1")) / 2,
@@ -201,7 +198,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_2"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_2")) / 2,
@@ -210,7 +207,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_3"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_3")) / 2,
@@ -219,7 +216,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_4"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_4")) / 2,
@@ -228,7 +225,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_5"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_5")) / 2,
@@ -237,7 +234,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.model.info"),
                 START_X,
@@ -250,7 +247,7 @@ public class ConfigScreen extends Screen {
     @Override
     public void onClose() {
         super.onClose();
-        minecraft.gui.setScreen(parentScreen);
+        VersionDifferences.setScreen(minecraft, parentScreen);
     }
     
     private void verify(Button button) {
@@ -283,7 +280,7 @@ public class ConfigScreen extends Screen {
             return;
         }
         
-        minecraft.gui.setScreen(parentScreen);
+        VersionDifferences.setScreen(minecraft, parentScreen);
     }
     
     private void onModelPathChange(String s) {
