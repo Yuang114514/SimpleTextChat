@@ -58,3 +58,7 @@ public class SimpleTextChatProcessor {
     }
 }
 ```
+
+## 运行时替换词典
+
+直接把目标文本弄成JSON列表 ，调用`cn.yuang2714.simple_text_chat.client.core.RecognizationManager.reConfigGrammar(String grammar)`传入即可

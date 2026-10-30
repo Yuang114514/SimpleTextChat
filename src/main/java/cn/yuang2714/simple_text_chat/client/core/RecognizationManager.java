@@ -1,5 +1,6 @@
 package cn.yuang2714.simple_text_chat.client.core;
 
+import cn.yuang2714.simple_text_chat.NoUnusedWarning;
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
 import cn.yuang2714.simple_text_chat.api.SimpleTextChatRecognizationEvent;
 import cn.yuang2714.simple_text_chat.client.SimpleTextChatClient;
@@ -196,6 +197,11 @@ public class RecognizationManager extends Thread {
             if (RecognizationManager.INSTANCE != null) RecognizationManager.INSTANCE.clean();
             HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
         }
+    }
+    
+    @NoUnusedWarning
+    public static void reConfigGrammar(String grammar) {
+        if (INSTANCE != null) INSTANCE.recognizer.setGrammar(grammar);
     }
     
     private String selectResult() {
