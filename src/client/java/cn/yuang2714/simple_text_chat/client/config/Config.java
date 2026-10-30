@@ -122,4 +122,15 @@ public class Config {
         if (value.equals("[]")) return Optional.empty();
         else return Optional.of(value);
     }
+    
+    public static void setModelDictionary(String dict) throws Exception {
+        JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
+        
+        if (content.has("modelDictionary")) {
+            content.remove("modelDictionary");
+        }
+        
+        content.addProperty("modelDictionary", dict);
+        FileUtils.write(content.toString(), configFile);
+    }
 }
