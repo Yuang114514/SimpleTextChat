@@ -1,6 +1,7 @@
 package cn.yuang2714.simple_text_chat.client;
 
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
+//import cn.yuang2714.simple_text_chat.api.SimpleTextChatRecognizationEvents;
 import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.core.RecognizationManager;
 import cn.yuang2714.simple_text_chat.client.minecrafts.ConfigScreen;
@@ -64,5 +65,8 @@ public class SimpleTextChatClient implements ClientModInitializer {
                     }
                 }
         );
+        
+//        SimpleTextChatRecognizationEvents.PARTIAL_EVENT.register(evt -> SimpleTextChat.LOGGER.info(evt.toString()));
+//        SimpleTextChatRecognizationEvents.RESULT_EVENT.register(evt -> SimpleTextChat.LOGGER.info(evt.toString()));
 	}
 }
