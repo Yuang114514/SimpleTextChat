@@ -1,6 +1,7 @@
 package cn.yuang2714.simple_text_chat.client.core;
 
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
+import cn.yuang2714.simple_text_chat.api.SimpleTextChatRecognizationEvent;
 import cn.yuang2714.simple_text_chat.client.SimpleTextChatClient;
 import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.config.ModelLanguage;
@@ -13,6 +14,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.common.MinecraftForge;
 import org.vosk.Model;
 import org.vosk.Recognizer;
 
@@ -266,17 +268,29 @@ public class RecognizationManager extends Thread {
                     boolean isFinal = recognizer.acceptWaveForm(buffer, bytesRead);
                     if (recognizationMode != RecognizationMode.HOLD_TO_SPEAK) {
                         if (isFinal) {
-                            result = processVoskResult(recognizer.getResult());
+                            String raw = recognizer.getResult();
+                            String processed = processVoskResult(raw);
+                            result = processed;
+                            postResult(new SimpleTextChatRecognizationEvent.Result(raw, processed));
                             if (recognizationMode == RecognizationMode.AUTO_DETECT) sendPlayerChat(result);
                         } else {
-                            partialResult = processVoskResult(recognizer.getPartialResult());
+                            String partial = recognizer.getPartialResult();
+                            String processed = processVoskResult(partial);
+                            partialResult = processed;
+                            postResult(new SimpleTextChatRecognizationEvent.Partial(partial, processed));
                         }
                     } else {
                         if (isFinal) {
+                            String raw = recognizer.getResult();
+                            String processed = processVoskResult(raw);
                             String lastResult = result;
                             result = (lastResult == null ? "" : lastResult) + processVoskResult(recognizer.getResult());
+                            postResult(new SimpleTextChatRecognizationEvent.Result(raw, processed));
                         } else {
-                            partialResult = processVoskResult(recognizer.getPartialResult());
+                            String partial = recognizer.getPartialResult();
+                            String processed = processVoskResult(partial);
+                            partialResult = processed;
+                            postResult(new SimpleTextChatRecognizationEvent.Partial(partial, processed));
                         }
                     }
                 }
@@ -289,6 +303,10 @@ public class RecognizationManager extends Thread {
             model.close();
             LOGGER.info("Finished Recognization Manager.");
         }
+    }
+    
+    private void postResult(SimpleTextChatRecognizationEvent evt) {
+        Minecraft.getInstance().execute(() -> MinecraftForge.EVENT_BUS.post(evt));
     }
     
     private String processVoskResult(String result) {

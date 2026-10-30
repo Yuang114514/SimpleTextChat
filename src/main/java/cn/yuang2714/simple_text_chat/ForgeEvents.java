@@ -1,5 +1,6 @@
 package cn.yuang2714.simple_text_chat;
 
+//import cn.yuang2714.simple_text_chat.api.SimpleTextChatRecognizationEvent;
 import cn.yuang2714.simple_text_chat.client.SimpleTextChatClient;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -24,4 +25,14 @@ public class ForgeEvents {
     public static void onLevelClear(LevelEvent.Unload event) {
         SimpleTextChatClient.onLevelClear();
     }
+    
+//    @SubscribeEvent
+//    public static void partial(SimpleTextChatRecognizationEvent.Partial evt) {
+//        SimpleTextChat.LOGGER.info("cached partial {}, {}", evt.getJsonRaw(), evt.getText());
+//    }
+//
+//    @SubscribeEvent
+//    public static void result(SimpleTextChatRecognizationEvent.Result evt) {
+//        SimpleTextChat.LOGGER.info("cached result {}, {}", evt.getJsonRaw(), evt.getText());
+//    }
 }

@@ -34,4 +34,27 @@ https://modrinth.com/mod/simple-text-chat/version
 
 对于每个配置项，`Config` 类里都有对应的Getter/Setter。直接调用即可。
 
-## 
+## 基于事件总线的API
+
+有两种结果类型，在`cn.yuang2714.simple_text_chat.api.SimpleTextChatRecognizationEvent`中声明
+
+只要注册到Forge的事件总线即可，示例：
+
+```java
+@Mod.EventBusSubscriber(modid = "mymod", bus = Bus.FORGE, value = Dist.CLIENT)
+public class SimpleTextChatProcessor {
+    @SubscribeEvent
+    public static void processPartial(SimpleTextChatRecognizationEvent.Partial event) {
+        String text = event.getText(); //处理好的文本
+        String raw = event.getJsonRaw(); //原始JSON文本
+        //处理逻辑
+    }
+    
+    @SubscribeEvent
+    public static void processResult(SimpleTextChatRecognizationEvent.Result event) {
+        String text = event.getText(); //处理好的文本
+        String raw = event.getJsonRaw(); //原始JSON文本
+        //处理逻辑
+    }
+}
+```
