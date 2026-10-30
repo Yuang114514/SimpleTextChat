@@ -38,7 +38,17 @@ public class Config {
     }
     
     public static Path getModelStorageFolder() throws Exception {
-        return Path.of(JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("modelFolder").getAsString());
+        return Path.of(
+                JsonParser
+                        .parseString(FileUtils.read(configFile))
+                        .getAsJsonObject()
+                        .get("modelFolder")
+                        .getAsString()
+                        .replace(
+                                "${GAME_DIR}",
+                                FabricLoader.getInstance().getGameDir().toAbsolutePath().toString()
+                        )
+        );
     }
     
     public static void setModelStorageFolder(Path modelStorageFolder) throws Exception {
@@ -48,7 +58,13 @@ public class Config {
             content.remove("modelFolder");
         }
         
-        content.addProperty("modelFolder", modelStorageFolder.toString());
+        content.addProperty(
+                "modelFolder",
+                modelStorageFolder
+                        .toAbsolutePath()
+                        .toString()
+                        .replace(FabricLoader.getInstance().getGameDir().toAbsolutePath().toString(), "${GAME_DIR}")
+        );
         FileUtils.write(content.toString(), configFile);
     }
     
