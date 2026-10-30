@@ -1,6 +1,7 @@
 package cn.yuang2714.simple_text_chat.client.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Path;
@@ -8,11 +9,17 @@ import java.util.Optional;
 
 public class Config {
     public static Path getModelStorageFolder() {
-        return Path.of(HOLDER.modelStoragePath.get());
+        return Path.of(HOLDER.modelStoragePath.get().replace("${GAME_DIR}", FMLPaths.GAMEDIR.get().toAbsolutePath().toString()));
     }
     
     public static void setModelStorageFolder(Path modelStorageFolder) {
-        HOLDER.modelStoragePath.set(modelStorageFolder.toFile().getAbsolutePath());
+        HOLDER.modelStoragePath.set(
+                modelStorageFolder.toFile().getAbsolutePath()
+                                  .replace(
+                                          FMLPaths.GAMEDIR.get().toAbsolutePath().toString(),
+                                          "${GAME_DIR}"
+                                  )
+        );
     }
     
     public static RecognizationMode getMode() {
@@ -49,7 +56,7 @@ public class Config {
         HOLDER.modelDictionary.set(dictionary);
     }
     
-    public static final Holder HOLDER;
+    private static final Holder HOLDER;
     public static final ForgeConfigSpec CONFIG_SPEC;
     
     static {
@@ -60,7 +67,7 @@ public class Config {
         CONFIG_SPEC = specPair.getRight();
     }
     
-    public static class Holder {
+    private static class Holder {
         public final ForgeConfigSpec.ConfigValue<String> modelStoragePath;
         public final ForgeConfigSpec.EnumValue<RecognizationMode> mode;
         public final ForgeConfigSpec.BooleanValue isSetup;
@@ -68,10 +75,10 @@ public class Config {
         public final ForgeConfigSpec.ConfigValue<String> modelDictionary;
         
         Holder(ForgeConfigSpec.Builder builder) {
-            builder.comment("Configs for Simple Text Chat").push("Config");
+            builder.comment("Configs for Simple Text Chat").push("SimpleTextChat");
             
             modelStoragePath = builder
-                    .comment("The storage folder of recognization model.")
+                    .comment("The storage folder of recognization model.\n'${GAME_DIR}' will be replaced to game directory.")
                             .define("modelStoragePath", "");
             
             mode = builder
@@ -81,6 +88,9 @@ public class Config {
             isSetup = builder
                     .comment("Whether mod has setup.")
                             .define("isSetup", false);
+            
+            builder.pop();
+            builder.comment("Configs for the Model").push("Model");
             
             lang = builder
                     .comment("Recognization Language.")
