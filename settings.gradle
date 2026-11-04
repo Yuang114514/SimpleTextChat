@@ -10,4 +10,5 @@ pluginManagement {
 }
 
 // Should match your modid
-rootProject.name = 'text_chat'
+rootProject.name = 'SimpleTextChat'
+include '26.1fabric'

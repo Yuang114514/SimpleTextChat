@@ -1,3 +1,4 @@
+/*
 plugins {
 	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
@@ -95,4 +96,116 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+*/
+
+//新项目的配置
+
+//抄
+plugins {
+    id 'net.fabricmc.fabric-loom' version "1.17-SNAPSHOT" apply(false)
+    id 'maven-publish'
+}
+
+//抄
+group = project.maven_group
+
+//全局配置
+allprojects {
+    apply plugin: 'java'
+
+    //公共资源目录
+    sourceSets {
+        main {
+            resources {
+                srcDir 'common_resources'
+            }
+        }
+    }
+}
+
+//子项目
+subprojects {
+    //公共资源目录
+    sourceSets {
+        main {
+            resources {
+                srcDirs += project(':').sourceSets.main.resources.srcDirs // 引用父级项目的资源文件夹
+            }
+        }
+    }
+
+    //抄
+    apply plugin: 'net.fabricmc.fabric-loom'
+
+    //抄
+    base {
+        archivesName = project(':').archives_base_name
+    }
+    setVersion(project.mod_version)
+
+    //抄
+    repositories {
+        // Add repositories to retrieve artifacts from in here.
+        // You should only use this when depending on other mods because
+        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+        // for more information about repositories.
+        mavenCentral()
+        maven {
+            name = "Terraformers"
+            url = "https://maven.terraformersmc.com/"
+        }
+    }
+
+    //抄
+    loom {
+        splitEnvironmentSourceSets()
+
+        mods {
+            "text_chat" {
+                sourceSet sourceSets.main
+                sourceSet sourceSets.client
+            }
+        }
+    }
+
+    //抄
+    dependencies {
+        // To change the versions see the gradle.properties file
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+        // Fabric API. This is technically optional, but you probably want it anyway.
+        implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+        include implementation("com.alphacephei:vosk:0.3.45")
+
+        implementation("com.terraformersmc:modmenu:${project.modmenu_version}")
+    }
+
+    //抄
+    processResources {
+        inputs.property "version", project.version
+
+        filesMatching("fabric.mod.json") {
+            expand "version": project.version
+        }
+    }
+}
+
+tasks.named("jar") {
+    enabled = false
+}
+
+//分项目定义java版本
+project(":26.1fabric") {
+    java {
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 25
+    }
 }
