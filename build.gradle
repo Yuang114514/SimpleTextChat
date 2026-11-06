@@ -129,6 +129,9 @@ subprojects {
     //公共资源目录
     sourceSets {
         main {
+            java {
+                srcDirs += project(":").file("common/src/main/java")
+            }
             resources {
                 srcDirs += project(':').sourceSets.main.resources.srcDirs // 引用父级项目的资源文件夹
             }
