@@ -86,7 +86,7 @@ public class Config {
     public static boolean isSetup() throws Exception {
         try {
             return JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("setup").getAsBoolean();
-        } catch (NullPointerException _) {
+        } catch (NullPointerException ignored) {
             return false;
         }
     }

@@ -12,6 +12,4 @@ pluginManagement {
 // Should match your modid
 rootProject.name = 'SimpleTextChat'
 include 'common'
-include '26.1'
-include '26.2'
-include '26.3'
+include '1.20.5'
