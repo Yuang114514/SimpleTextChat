@@ -47,7 +47,7 @@ public class SimpleTextChatCommon {
                 RecognizationManager.onCancelKeyClick();
         });
 
-        ScreenEvents.AFTER_INIT.register((minecraft, screen, _, _) -> {
+        ScreenEvents.AFTER_INIT.register((_, screen, _, _) -> {
             if (isDisabled) return;
 
             try {

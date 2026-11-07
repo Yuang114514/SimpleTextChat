@@ -80,7 +80,7 @@ public class ConfigScreen extends Screen {
         addRenderableWidget(
                 Button.builder(
                         VersionDifferences.translatable("gui.text_chat.setup.model.download_button_text"),
-                        _ -> Util.getPlatform().openUri("https://alphacephei.com/vosk/models")
+                        _ -> MinecraftVersionHelper.HELPER.openUri("https://alphacephei.com/vosk/models")
                 ).bounds(
                         START_X + 305,
                         START_Y + 60,

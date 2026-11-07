@@ -118,9 +118,14 @@ public class Config {
     }
     
     public static Optional<String> getModelDictionary() throws Exception {
-        String value = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("modelDictionary").getAsJsonArray().toString();
-        if (value.equals("[]")) return Optional.empty();
-        else return Optional.of(value);
+        try {
+            String value = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("modelDictionary")
+                                     .getAsJsonArray().toString();
+            if (value.equals("[]")) return Optional.empty();
+            else return Optional.of(value);
+        } catch (NullPointerException e) {
+            return Optional.empty();
+        }
     }
     
     public static void setModelDictionary(String dict) throws Exception {

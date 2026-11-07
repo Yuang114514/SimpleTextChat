@@ -8,7 +8,7 @@ public class SimpleTextChatClient implements ClientModInitializer {
     
 	@Override
 	public void onInitializeClient() {
-        MinecraftVersionHelper.setHelper(new Minecraft26_2VersionHelper());
+        MinecraftVersionHelper.setHelper(new Minecraft26_3VersionHelper());
         SimpleTextChatCommon.onInitializeClient();
 	}
 }

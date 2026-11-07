@@ -1,9 +1,8 @@
 package cn.yuang2714.simple_text_chat.client.minecrafts;
 
-import com.mojang.blaze3d.platform.InputConstants;
+import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
-import org.lwjgl.glfw.GLFW;
 
 public class KeyMappings {
     
@@ -13,34 +12,37 @@ public class KeyMappings {
     
     public static KeyMapping registerFeatureToggleKey() {
         return KeyMappingHelper.registerKeyMapping(
-                new KeyMapping(
-                        "text.text_chat.key_mappings.feature_toggle",
-                        InputConstants.Type.KEYSYM,
-                        GLFW.GLFW_KEY_COMMA,
-                        CATEGORY
-                )
+                MinecraftVersionHelper.HELPER.getFeatureToggleKey()
+//                new KeyMapping(
+//                        "text.text_chat.key_mappings.feature_toggle",
+//                        InputConstants.Type.KEYSYM,
+//                        GLFW.GLFW_KEY_COMMA,
+//                        CATEGORY
+//                )
         );
     }
     
     public static KeyMapping registerSpeechDoneKey() {
         return KeyMappingHelper.registerKeyMapping(
-                new KeyMapping(
-                        "text.text_chat.key_mappings.speech_done",
-                        InputConstants.Type.KEYSYM,
-                        GLFW.GLFW_KEY_X,
-                        CATEGORY
-                )
+                MinecraftVersionHelper.HELPER.getSpeechDoneKey()
+//                new KeyMapping(
+//                        "text.text_chat.key_mappings.speech_done",
+//                        InputConstants.Type.KEYSYM,
+//                        GLFW.GLFW_KEY_X,
+//                        CATEGORY
+//                )
         );
     }
     
     public static KeyMapping registerSpeechCancelKey() {
         return KeyMappingHelper.registerKeyMapping(
-                new KeyMapping(
-                        "text.text_chat.key_mappings.speech_cancel",
-                        InputConstants.Type.KEYSYM,
-                        GLFW.GLFW_KEY_C,
-                        CATEGORY
-                )
+                MinecraftVersionHelper.HELPER.getSpeechCancelKey()
+//                new KeyMapping(
+//                        "text.text_chat.key_mappings.speech_cancel",
+//                        InputConstants.Type.KEYSYM,
+//                        GLFW.GLFW_KEY_C,
+//                        CATEGORY
+//                )
         );
     }
 }
