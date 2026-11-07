@@ -12,7 +12,6 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.Util;
 import org.jspecify.annotations.NonNull;
 import org.vosk.Model;
 
@@ -46,7 +45,7 @@ public class ConfigScreen extends Screen {
             cfgModelLang = Config.getModelLanguage();
             cfgModelPath = Config.getModelStorageFolder().toAbsolutePath().toString();
             cfgRecognizationMode = Config.getMode();
-        } catch (Exception _) {
+        } catch (Exception ignored) {
             cfgModelPath = "";
             cfgRecognizationMode = RecognizationMode.AUTO_DETECT;
             cfgModelLang = ModelLanguage.CHINESE;
@@ -80,7 +79,7 @@ public class ConfigScreen extends Screen {
         addRenderableWidget(
                 Button.builder(
                         VersionDifferences.translatable("gui.text_chat.setup.model.download_button_text"),
-                        _ -> MinecraftVersionHelper.HELPER.openUri("https://alphacephei.com/vosk/models")
+                        ignored -> MinecraftVersionHelper.HELPER.openUri("https://alphacephei.com/vosk/models")
                 ).bounds(
                         START_X + 305,
                         START_Y + 60,
@@ -120,7 +119,7 @@ public class ConfigScreen extends Screen {
                 400,
                 20,
                 VersionDifferences.translatable("gui.text_chat.setup.lang.info"),
-                (button, _) ->
+                (button, ignored) ->
                         button.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.lang.tooltip")))
         );
         languages.setTooltip(Tooltip.create(VersionDifferences.translatable("gui.text_chat.setup.lang.tooltip")));

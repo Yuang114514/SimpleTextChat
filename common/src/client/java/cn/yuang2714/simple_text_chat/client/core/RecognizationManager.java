@@ -124,7 +124,7 @@ public class RecognizationManager extends Thread {
             
             try {
                 Thread.sleep(500);
-            } catch (InterruptedException _) {}
+            } catch (InterruptedException ignored) {}
         }
     }
     
@@ -230,7 +230,7 @@ public class RecognizationManager extends Thread {
         try {
             recognizationThread.join();
             if (Thread.currentThread() != this || getState() != State.NEW) join();
-        } catch (InterruptedException _) {}
+        } catch (InterruptedException ignored) {}
         
         LOGGER.info("Recognization Manager cleaned.");
 
@@ -247,7 +247,7 @@ public class RecognizationManager extends Thread {
             while (true) {
                 if (isFinished) return;
                 if (!isRecording) {
-                    try { Thread.sleep(100); } catch (InterruptedException _) {}
+                    try { Thread.sleep(100); } catch (InterruptedException ignored) {}
                     continue;
                 }
                 

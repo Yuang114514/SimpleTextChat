@@ -36,7 +36,7 @@ public class SimpleTextChatCommon {
         KeyMapping speechDoneKey = KeyMappings.registerSpeechDoneKey();
         KeyMapping speechCancelKey = KeyMappings.registerSpeechCancelKey();
 
-        ClientTickEvents.END_CLIENT_TICK.register(_ -> {
+        ClientTickEvents.END_CLIENT_TICK.register(ignored -> {
             if (isDisabled) return;
 
             if (featureToggleKey.consumeClick())
@@ -47,20 +47,20 @@ public class SimpleTextChatCommon {
                 RecognizationManager.onCancelKeyClick();
         });
 
-        ScreenEvents.AFTER_INIT.register((_, screen, _, _) -> {
+        ScreenEvents.AFTER_INIT.register((mc, screen, a, b) -> {
             if (isDisabled) return;
 
             try {
                 if (screen instanceof TitleScreen titleScreen && !Config.isSetup()) {
                     MinecraftVersionHelper.HELPER.setScreen(new ConfigScreen(titleScreen));
                 }
-            } catch (Exception _) {}
+            } catch (Exception ignored) {}
         });
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Identifier.fromNamespaceAndPath(SimpleTextChat.MOD_ID, "message_hud"), new HudTexts());
 
         ServerLevelEvents.UNLOAD.register(
-                (_, _) -> {
+                (mc, scr) -> {
                     if (!isDisabled && RecognizationManager.INSTANCE != null) {
                         RecognizationManager.INSTANCE.clean();
                     }

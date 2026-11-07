@@ -9,7 +9,7 @@ import net.minecraft.util.Util;
 import org.lwjgl.glfw.GLFW;
 import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;
 
-public class Minecraft26_1VersionHelper implements IMinecraftVersionHelper {
+public class Minecraft1_20_5VersionHelper implements IMinecraftVersionHelper {
     @Override
     public void setScreen(Screen s) {
         Minecraft.getInstance().setScreen(s);

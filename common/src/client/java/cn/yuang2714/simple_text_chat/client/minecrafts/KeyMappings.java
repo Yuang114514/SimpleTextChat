@@ -1,17 +1,15 @@
 package cn.yuang2714.simple_text_chat.client.minecrafts;
 
 import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 
 public class KeyMappings {
     
-    public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
-            VersionDifferences.resourceLocationFromNamespaceAndPath("text_chat", "keybind")
-    );
+    public static final String CATEGORY = "key.category.text_chat.keybind";
     
     public static KeyMapping registerFeatureToggleKey() {
-        return KeyMappingHelper.registerKeyMapping(
+        return KeyBindingHelper.registerKeyBinding(
                 MinecraftVersionHelper.HELPER.getFeatureToggleKey()
 //                new KeyMapping(
 //                        "text.text_chat.key_mappings.feature_toggle",
@@ -23,7 +21,7 @@ public class KeyMappings {
     }
     
     public static KeyMapping registerSpeechDoneKey() {
-        return KeyMappingHelper.registerKeyMapping(
+        return KeyBindingHelper.registerKeyBinding(
                 MinecraftVersionHelper.HELPER.getSpeechDoneKey()
 //                new KeyMapping(
 //                        "text.text_chat.key_mappings.speech_done",
@@ -35,7 +33,7 @@ public class KeyMappings {
     }
     
     public static KeyMapping registerSpeechCancelKey() {
-        return KeyMappingHelper.registerKeyMapping(
+        return KeyBindingHelper.registerKeyBinding(
                 MinecraftVersionHelper.HELPER.getSpeechCancelKey()
 //                new KeyMapping(
 //                        "text.text_chat.key_mappings.speech_cancel",
