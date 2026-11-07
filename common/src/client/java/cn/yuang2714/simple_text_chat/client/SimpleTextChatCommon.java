@@ -10,13 +10,11 @@ import cn.yuang2714.simple_text_chat.client.minecrafts.HudTexts;
 import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;
 import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.resources.Identifier;
 
 public class SimpleTextChatCommon {
     public static boolean isDisabled = false;
@@ -56,11 +54,11 @@ public class SimpleTextChatCommon {
                 }
             } catch (Exception ignored) {}
         });
+        
+        HudRenderCallback.EVENT.register(new HudTexts());
 
-        HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Identifier.fromNamespaceAndPath(SimpleTextChat.MOD_ID, "message_hud"), new HudTexts());
-
-        ServerLevelEvents.UNLOAD.register(
-                (mc, scr) -> {
+        ServerWorldEvents.UNLOAD.register(
+                (mc, level) -> {
                     if (!isDisabled && RecognizationManager.INSTANCE != null) {
                         RecognizationManager.INSTANCE.clean();
                     }

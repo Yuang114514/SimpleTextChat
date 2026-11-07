@@ -49,17 +49,19 @@ subprojects { Project sub ->
         // Vosk (如果 common 和版本模块都要用，放这里)
         include implementation("com.alphacephei:vosk:0.3.45")
         // ModMenu (如果你 common 里的代码也引用了它的 API，放这里；否则可以移到下面的 if 块里)
-        implementation("com.terraformersmc:modmenu:${project.modmenu_version}")
+        modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
     }
 
     // =========================================================
     // 🚨 核心：区分 common 和 版本模块 (26.1, 26.2 等)
     // =========================================================
     if (sub.name != 'common') {
-        // 1. 版本模块必须依赖 common
+        /*
         dependencies {
             implementation project(':common')
         }
+
+         */
 
         sourceSets {
             main {
@@ -119,14 +121,13 @@ subprojects { Project sub ->
     }
 
     //common的特殊配置
+
     if (sub.name == 'common') {
         tasks.named("jar") {
             enabled = false
         }
+        tasks.named('remapJar') {
+            enabled = false
+        }
     }
 }
-
-// 禁用根项目打 jar 包，避免生成无用的空包
-//tasks.named("jar") {
-//    enabled = false
-//}

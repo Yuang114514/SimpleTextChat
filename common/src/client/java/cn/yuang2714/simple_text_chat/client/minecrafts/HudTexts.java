@@ -1,19 +1,16 @@
 package cn.yuang2714.simple_text_chat.client.minecrafts;
 
 import cn.yuang2714.simple_text_chat.client.SimpleTextChatCommon;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import org.jspecify.annotations.NonNull;
 
-public class HudTexts implements HudElement {
+public class HudTexts implements HudRenderCallback {
     public volatile static Component text = VersionDifferences.translatable("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
     
-    @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, @NonNull DeltaTracker deltaTracker) {
+    public void onHudRender(GuiGraphics graphics, float delta) {
         if (SimpleTextChatCommon.isDisabled) return;
         
         Minecraft mc = Minecraft.getInstance();
@@ -30,7 +27,7 @@ public class HudTexts implements HudElement {
                 0x80_00_00_00
         );
         
-        graphics.text(
+        graphics.drawString(
                 mc.font,
                 text,
                 textX,

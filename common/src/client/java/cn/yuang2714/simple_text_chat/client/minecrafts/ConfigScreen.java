@@ -4,7 +4,7 @@ import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.config.ModelLanguage;
 import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
 import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
@@ -12,7 +12,6 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
-import org.jspecify.annotations.NonNull;
 import org.vosk.Model;
 
 import java.io.IOException;
@@ -90,9 +89,11 @@ public class ConfigScreen extends Screen {
                 ).build()
         );
         
-        modes = CycleButton.builder(
-                recognizationMode -> recognizationMode.getName().setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(
-                        recognizationMode.getTooltip()))),
+        modes = CycleButton.<RecognizationMode>builder(
+                recognizationMode -> recognizationMode.getName().setStyle(Style.EMPTY.withHoverEvent(new HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        recognizationMode.getTooltip())))
+        ).withInitialValue(
                 lastRecognizationMode
         ).withValues(
                 RecognizationMode.values()
@@ -108,8 +109,9 @@ public class ConfigScreen extends Screen {
         modes.setTooltip(Tooltip.create(lastRecognizationMode.getTooltip()));
         addRenderableWidget(modes);
         
-        languages = CycleButton.builder(
-                ModelLanguage::getName,
+        languages = CycleButton.<ModelLanguage>builder(
+                ModelLanguage::getName
+        ).withInitialValue(
                 lastModelLang
         ).withValues(
                 ModelLanguage.values()
@@ -170,8 +172,8 @@ public class ConfigScreen extends Screen {
     }
     
     @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        super.extractRenderState(graphics, mouseX, mouseY, a);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float a) {
+        super.render(graphics, mouseX, mouseY, a);
         
 //        //DEBUG: 原点
 //        graphics.fill(
@@ -182,7 +184,7 @@ public class ConfigScreen extends Screen {
 //                0xFF_FF_00_00
 //        );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.title"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.title")) / 2,
@@ -191,7 +193,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_1"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_1")) / 2,
@@ -200,7 +202,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_2"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_2")) / 2,
@@ -209,7 +211,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_3"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_3")) / 2,
@@ -218,7 +220,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_4"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_4")) / 2,
@@ -227,7 +229,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.description.line_5"),
                 width / 2 - font.width(VersionDifferences.translatable("gui.text_chat.setup.description.line_5")) / 2,
@@ -236,7 +238,7 @@ public class ConfigScreen extends Screen {
                 true
         );
         
-        graphics.text(
+        graphics.drawString(
                 font,
                 VersionDifferences.translatable("gui.text_chat.setup.model.info"),
                 START_X,

@@ -5,7 +5,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
 import org.lwjgl.glfw.GLFW;
 import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;
 
