@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.TitleScreen;
 
 public class SimpleTextChatCommon {
@@ -55,7 +56,7 @@ public class SimpleTextChatCommon {
             } catch (Exception ignored) {}
         });
         
-        HudRenderCallback.EVENT.register(new HudTexts());
+        HudRenderCallback.EVENT.register((graphics, delta) -> HudTexts.onHudRender(graphics));
 
         ServerWorldEvents.UNLOAD.register(
                 (mc, level) -> {

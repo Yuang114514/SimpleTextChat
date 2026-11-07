@@ -7,10 +7,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
-public class HudTexts implements HudRenderCallback {
+public class HudTexts {
     public volatile static Component text = VersionDifferences.translatable("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
     
-    public void onHudRender(GuiGraphics graphics, float delta) {
+    public static void onHudRender(GuiGraphics graphics) {
         if (SimpleTextChatCommon.isDisabled) return;
         
         Minecraft mc = Minecraft.getInstance();
