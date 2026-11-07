@@ -13,4 +13,4 @@ pluginManagement {
 rootProject.name = 'SimpleTextChat'
 include 'common'
 include '1.20.5'
-include '1.21'
+include '1.21.5'

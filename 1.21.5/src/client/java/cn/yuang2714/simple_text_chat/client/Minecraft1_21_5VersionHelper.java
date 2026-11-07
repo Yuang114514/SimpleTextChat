@@ -6,10 +6,12 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import org.lwjgl.glfw.GLFW;
 import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;
 
-public class Minecraft1_20_5VersionHelper implements IMinecraftVersionHelper {
+public class Minecraft1_21_5VersionHelper implements IMinecraftVersionHelper {
     @Override
     public void setScreen(Screen s) {
         Minecraft.getInstance().setScreen(s);
@@ -48,5 +50,10 @@ public class Minecraft1_20_5VersionHelper implements IMinecraftVersionHelper {
     @Override
     public void openUri(String uri) {
         Util.getPlatform().openUri(uri);
+    }
+    
+    @Override
+    public HoverEvent getShowTextEvent(Component text) {
+        return new HoverEvent.ShowText(text);
     }
 }

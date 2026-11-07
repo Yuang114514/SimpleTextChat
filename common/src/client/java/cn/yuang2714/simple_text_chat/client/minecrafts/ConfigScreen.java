@@ -90,9 +90,9 @@ public class ConfigScreen extends Screen {
         );
         
         modes = CycleButton.<RecognizationMode>builder(
-                recognizationMode -> recognizationMode.getName().setStyle(Style.EMPTY.withHoverEvent(new HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        recognizationMode.getTooltip())))
+                recognizationMode -> recognizationMode.getName().setStyle(Style.EMPTY.withHoverEvent(
+                        MinecraftVersionHelper.HELPER.getShowTextEvent(recognizationMode.getTooltip())
+                ))
         ).withInitialValue(
                 lastRecognizationMode
         ).withValues(
