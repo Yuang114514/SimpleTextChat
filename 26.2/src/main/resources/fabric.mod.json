@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "text_chat",
+	"version": "${version}",
+	"name": "Simple Text Chat",
+	"description": "A simple mod that allows you to chat with voices while playing by recognize your voice to chat messages.",
+	"authors": [
+		"Yuang2714"
+	],
+	"contact": {
+		"sources": "https://github.com/Yuang114514/SimpleTextChat"
+	},
+	"license": "MIT",
+	"icon": "assets/text_chat/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"cn.yuang2714.simple_text_chat.client.SimpleTextChatClient"
+		],
+		"modmenu": [
+			"cn.yuang2714.simple_text_chat.client.SimpleTextChatModMenuApiImpl"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": ">=26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"update_checker": false
+		}
+	}
+}

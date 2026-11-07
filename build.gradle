@@ -6,69 +6,83 @@ plugins {
 
 group = project.maven_group
 
-allprojects {
+subprojects { Project sub ->
+    // 所有子模块（包括 common 和 26.1、26.2）统一应用 Java 和 Loom 插件
     apply plugin: 'java'
+    apply plugin: 'net.fabricmc.fabric-loom'
 
-    // 全局公共资源目录 (根目录下的 common_resources)
-    sourceSets {
-        main {
-            resources {
-                srcDir 'common_resources'
+    // 统一 JDK 版本 (26.x 系列全用 25)
+    java {
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
+
+        withSourcesJar()
+    }
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 25
+    }
+
+    // 统一仓库
+    repositories {
+        mavenCentral()
+        maven { name = "Terraformers"; url = "https://maven.terraformersmc.com/" }
+    }
+
+    // 统一 Loom 环境拆分
+    loom {
+        splitEnvironmentSourceSets()
+        mods {
+            "text_chat" {
+                sourceSet sourceSets.main
+                sourceSet sourceSets.client
             }
         }
     }
-}
 
-subprojects {
-    // 1. 只有非 common 模块，才应用 Fabric Loom 和 MC 相关配置
-    if (name != 'common') {
-        apply plugin: 'net.fabricmc.fabric-loom'
+    // 所有模块通用的基础依赖 (common 也要用)
+    dependencies {
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+        implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-        // 共享 common 目录下的 Java 源码和根目录的资源
+        // Vosk (如果 common 和版本模块都要用，放这里)
+        include implementation("com.alphacephei:vosk:0.3.45")
+        // ModMenu (如果你 common 里的代码也引用了它的 API，放这里；否则可以移到下面的 if 块里)
+        implementation("com.terraformersmc:modmenu:${project.modmenu_version}")
+    }
+
+    // =========================================================
+    // 🚨 核心：区分 common 和 版本模块 (26.1, 26.2 等)
+    // =========================================================
+    if (sub.name != 'common') {
+        // 1. 版本模块必须依赖 common
+        dependencies {
+            implementation project(':common')
+        }
+
         sourceSets {
             main {
                 java {
-                    srcDirs += project(":").file("common/src/main/java")
+                    srcDirs += project(':common').file('src/main/java')
                 }
                 resources {
-                    srcDirs += project(':').sourceSets.main.resources.srcDirs
+                    srcDirs += project(':common').file('src/main/resources')
+                }
+            }
+            client {
+                java {
+                    srcDirs += project(':common').file('src/client/java')
                 }
             }
         }
 
+        // 2. 版本模块的包名、版本号
         base {
             archivesName = project(':').archives_base_name
         }
         setVersion(project.mod_version)
 
-        repositories {
-            mavenCentral()
-            maven {
-                name = "Terraformers"
-                url = "https://maven.terraformersmc.com/"
-            }
-        }
-
-        loom {
-            splitEnvironmentSourceSets()
-            mods {
-                "text_chat" {
-                    sourceSet sourceSets.main
-                    sourceSet sourceSets.client
-                }
-            }
-        }
-
-        dependencies {
-            minecraft "com.mojang:minecraft:${project.minecraft_version}"
-            implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-            implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-
-            // 注意：Vosk 建议放在 common 模块的 build.gradle 里，但如果你想在这里 include 也行
-            include implementation("com.alphacephei:vosk:0.3.45")
-            implementation("com.terraformersmc:modmenu:${project.modmenu_version}")
-        }
-
+        // 3. 只有版本模块才处理自己的 fabric.mod.json 并打最终包
         processResources {
             inputs.property "version", project.version
             filesMatching("fabric.mod.json") {
@@ -76,7 +90,7 @@ subprojects {
             }
         }
 
-        // 把之前旧代码里的 jar 打包逻辑加回来
+        // 4. 打包 License
         jar {
             from(project.projectDir) {
                 include 'VOSK_LICENSE'
@@ -86,10 +100,32 @@ subprojects {
                 rename { "${it}_${project.archivesBaseName}" }
             }
         }
+
+        // 注册一个名为 copyJarToRoot 的复制任务
+        tasks.register('copyJarToRoot', Copy) {
+            // 从当前子项目的 build/libs 目录复制
+            from(layout.buildDirectory.dir('libs'))
+            // 只复制 .jar 文件，忽略其他可能的中间产物
+            include '*.jar'
+            // 目标路径：根项目的 build/libs
+            into rootProject.layout.buildDirectory.dir('libs')
+        }
+
+        // 关键：当这个子项目的 build 任务执行完毕后，自动执行 copyJarToRoot
+        tasks.named('build') {
+            finalizedBy 'copyJarToRoot'
+        }
+    }
+
+    //common的特殊配置
+    if (sub.name == 'common') {
+        tasks.named("jar") {
+            enabled = false
+        }
     }
 }
 
 // 禁用根项目打 jar 包，避免生成无用的空包
-tasks.named("jar") {
-    enabled = false
-}
+//tasks.named("jar") {
+//    enabled = false
+//}
