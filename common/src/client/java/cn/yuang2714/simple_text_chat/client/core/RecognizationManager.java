@@ -1,8 +1,8 @@
 package cn.yuang2714.simple_text_chat.client.core;
 
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
-import cn.yuang2714.simple_text_chat.client.api.SimpleTextChatRecognizationEvents;
 import cn.yuang2714.simple_text_chat.client.SimpleTextChatCommon;
+import cn.yuang2714.simple_text_chat.client.api.SimpleTextChatRecognizationEvents;
 import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.config.ModelLanguage;
 import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
@@ -18,7 +18,6 @@ import org.vosk.Model;
 import org.vosk.Recognizer;
 
 import javax.sound.sampled.*;
-
 import java.util.Optional;
 
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;

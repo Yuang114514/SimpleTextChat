@@ -1,7 +1,6 @@
 package cn.yuang2714.simple_text_chat.client.minecrafts;
 
 import cn.yuang2714.simple_text_chat.client.SimpleTextChatCommon;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

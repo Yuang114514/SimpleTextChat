@@ -1,15 +1,23 @@
 package cn.yuang2714.simple_text_chat.client;
 
+import cn.yuang2714.simple_text_chat.SimpleTextChat;
 import cn.yuang2714.simple_text_chat.client.mcver.IMinecraftVersionHelper;
+import cn.yuang2714.simple_text_chat.client.minecrafts.HudTexts;
+import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
-import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;
+
+import java.util.function.Function;
 
 public class Minecraft1_21_5VersionHelper implements IMinecraftVersionHelper {
     @Override
@@ -55,5 +63,19 @@ public class Minecraft1_21_5VersionHelper implements IMinecraftVersionHelper {
     @Override
     public HoverEvent getShowTextEvent(Component text) {
         return new HoverEvent.ShowText(text);
+    }
+    
+    @Override
+    public <T> CycleButton.Builder<T> cycleButtonBuilder(Function<T, Component> onValueChange, T initialValue) {
+        return CycleButton.builder(onValueChange).withInitialValue(initialValue);
+    }
+    
+    @Override
+    public void registerHud() {
+        HudElementRegistry.attachElementBefore(
+                VanillaHudElements.CHAT,
+                ResourceLocation.fromNamespaceAndPath(SimpleTextChat.MOD_ID, "message_hud"),
+                (graphics, delta) -> HudTexts.onHudRender(graphics)
+        );
     }
 }

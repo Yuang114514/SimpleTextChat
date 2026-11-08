@@ -2,20 +2,18 @@ package cn.yuang2714.simple_text_chat.client;
 
 import cn.yuang2714.simple_text_chat.ConfigInitializationFailedException;
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
-//import cn.yuang2714.simple_text_chat.api.SimpleTextChatRecognizationEvents;
 import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.core.RecognizationManager;
-import cn.yuang2714.simple_text_chat.client.minecrafts.ConfigScreen;
-import cn.yuang2714.simple_text_chat.client.minecrafts.HudTexts;
-import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;
 import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;
+import cn.yuang2714.simple_text_chat.client.minecrafts.ConfigScreen;
+import cn.yuang2714.simple_text_chat.client.minecrafts.KeyMappings;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.TitleScreen;
+
+//import cn.yuang2714.simple_text_chat.api.SimpleTextChatRecognizationEvents;
 
 public class SimpleTextChatCommon {
     public static boolean isDisabled = false;
@@ -56,7 +54,7 @@ public class SimpleTextChatCommon {
             } catch (Exception ignored) {}
         });
         
-        HudRenderCallback.EVENT.register((graphics, delta) -> HudTexts.onHudRender(graphics));
+        MinecraftVersionHelper.HELPER.registerHud();
 
         ServerWorldEvents.UNLOAD.register(
                 (mc, level) -> {

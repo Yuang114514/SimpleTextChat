@@ -1,9 +1,12 @@
 package cn.yuang2714.simple_text_chat.client.mcver;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+
+import java.util.function.Function;
 
 public interface IMinecraftVersionHelper {
     void setScreen(Screen screen);
@@ -15,4 +18,8 @@ public interface IMinecraftVersionHelper {
     void openUri(String uri);
     
     HoverEvent getShowTextEvent(Component text);
+    
+    <T> CycleButton.Builder<T> cycleButtonBuilder(Function<T, Component> onValueChange, T initialValue);
+    
+    void registerHud();
 }

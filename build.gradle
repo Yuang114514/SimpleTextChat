@@ -52,9 +52,6 @@ subprojects { Project sub ->
         modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
     }
 
-    // =========================================================
-    // 🚨 核心：区分 common 和 版本模块 (26.1, 26.2 等)
-    // =========================================================
     if (sub.name != 'common') {
         /*
         dependencies {

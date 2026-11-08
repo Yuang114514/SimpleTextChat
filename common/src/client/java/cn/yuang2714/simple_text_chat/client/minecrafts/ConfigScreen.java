@@ -3,14 +3,14 @@ package cn.yuang2714.simple_text_chat.client.minecrafts;
 import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.config.ModelLanguage;
 import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
-import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;import net.minecraft.ChatFormatting;
+import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import org.vosk.Model;
 
@@ -89,12 +89,10 @@ public class ConfigScreen extends Screen {
                 ).build()
         );
         
-        modes = CycleButton.<RecognizationMode>builder(
+        modes = MinecraftVersionHelper.HELPER.cycleButtonBuilder(
                 recognizationMode -> recognizationMode.getName().setStyle(Style.EMPTY.withHoverEvent(
                         MinecraftVersionHelper.HELPER.getShowTextEvent(recognizationMode.getTooltip())
-                ))
-        ).withInitialValue(
-                lastRecognizationMode
+                )), lastRecognizationMode
         ).withValues(
                 RecognizationMode.values()
         ).create(
@@ -109,9 +107,8 @@ public class ConfigScreen extends Screen {
         modes.setTooltip(Tooltip.create(lastRecognizationMode.getTooltip()));
         addRenderableWidget(modes);
         
-        languages = CycleButton.<ModelLanguage>builder(
-                ModelLanguage::getName
-        ).withInitialValue(
+        languages = MinecraftVersionHelper.HELPER.cycleButtonBuilder(
+                ModelLanguage::getName,
                 lastModelLang
         ).withValues(
                 ModelLanguage.values()
