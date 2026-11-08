@@ -70,6 +70,7 @@ subprojects { Project sub ->
                 }
                 resources {
                     srcDirs += project(':common').file('src/main/resources')
+                    srcDirs += project(':').file('include') //把版权文件放进去
                 }
             }
             client {
