@@ -17,7 +17,10 @@ import net.minecraft.network.chat.Component;
 import org.vosk.Model;
 import org.vosk.Recognizer;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.TargetDataLine;
 import java.util.Optional;
 
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
@@ -31,10 +34,9 @@ public class RecognizationManager extends Thread {
     private final Recognizer recognizer;
     private final RecognizationMode recognizationMode;
     private final ModelLanguage language;
-    private final String modelName;
     
-    private static final AudioFormat audioFormat = new AudioFormat(16000.0f, 16, 1, true, false);
-    private static final DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
+    public static AudioFormat audioFormat = new AudioFormat(Config.getSampleRate(), 16, 1, true, false);
+    public static DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
     
     private volatile boolean isRecording = true;
     private volatile String partialResult;
@@ -46,6 +48,7 @@ public class RecognizationManager extends Thread {
     
     public RecognizationManager() throws Exception {
         super();
+        refreshInfo();
         
         LOGGER.info("Initializing Recognization Manager.");
         
@@ -53,12 +56,11 @@ public class RecognizationManager extends Thread {
         
         Optional<String> dictionary = Config.getModelDictionary();
         recognizer = dictionary.isEmpty()
-                     ? new Recognizer(model, 16000.0f)
-                     : new Recognizer(model, 16000.0f, dictionary.get());
+                     ? new Recognizer(model, Config.getSampleRate())
+                     : new Recognizer(model, Config.getSampleRate(), dictionary.get());
         
         recognizationMode = Config.getMode();
         language = Config.getModelLanguage();
-        modelName = Config.getModelStorageFolder().getFileName().toString();
         
         recognizationThread = new Thread(this::recognize);
         recognizationThread.setName("Audio Recognization Thread");
@@ -68,7 +70,7 @@ public class RecognizationManager extends Thread {
         
         setName("Recognization Manager Thread");
         
-        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.ready").withStyle(ChatFormatting.GREEN);
+        HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.ready").withStyle(ChatFormatting.GREEN);
         LOGGER.info("Recognization Manager Started. RecognizationMode: {}", recognizationMode);
     }
     
@@ -77,23 +79,25 @@ public class RecognizationManager extends Thread {
         hasActiveInitializer = true;
         
         String model = "ERROR";
-        Component mode = VersionDifferences.translatable("ERROR");
+        Component mode = VersionDifferences.literalComponent("ERROR").withStyle(ChatFormatting.RED);
+        Component microphoneName = VersionDifferences.literalComponent("ERROR").withStyle(ChatFormatting.RED);
         try {
             model = Config.getModelStorageFolder().getFileName().toString();
             mode = Config.getMode().getName();
+            microphoneName = MicrophoneManager.getDisplayName(MicrophoneManager.getMicrophoneFromConfig(MicrophoneManager.listMixers()).orElseThrow());
         } catch (Exception e) {
             LOGGER.error("Failed to initialize Recognization Manager.", e);
-            HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
+            HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
         }
         
-        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.preparing", model, mode).withStyle(ChatFormatting.GREEN);
+        HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.preparing", model, mode, microphoneName).withStyle(ChatFormatting.GREEN);
         
         new Thread(() -> {
             try {
                 INSTANCE = new RecognizationManager();
             } catch (Exception e) {
                 LOGGER.error("Failed to initialize Recognization Manager.", e);
-                HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
+                HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
                 hasActiveInitializer = false;
                 return;
             }
@@ -127,23 +131,15 @@ public class RecognizationManager extends Thread {
         }
     }
     
-    private void interval() {
-        if (partialResult == null || partialResult.isEmpty()) {
-            partialResult = " ";
+    public static synchronized void featureToggleAction() {
+        isEnabled = !isEnabled;
+        
+        if (isEnabled) {
+            RecognizationManager.setup();
+        } else {
+            if (RecognizationManager.INSTANCE != null) RecognizationManager.INSTANCE.clean();
+            HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
         }
-        
-        HudTexts.text = VersionDifferences.translatable(
-                "hud.text_chat.status.rec_msg",
-                (
-                        isRecording
-                        ? VersionDifferences.translatable("hud.text_chat.status.ing", addCursor(partialResult))
-                        : VersionDifferences.translatable("hud.text_chat.status.ready")
-                ),
-                modelName,
-                recognizationMode.getName()
-        );
-        
-        LOGGER.debug("Synchronized Partial Result ‘{}’ to HUD.", partialResult);
     }
     
     private String addCursor(String s) {
@@ -185,15 +181,22 @@ public class RecognizationManager extends Thread {
         INSTANCE.needCancel = true;
     }
     
-    public static synchronized void featureToggleAction() {
-        isEnabled = !isEnabled;
-        
-        if (isEnabled) {
-            RecognizationManager.setup();
-        } else {
-            if (RecognizationManager.INSTANCE != null) RecognizationManager.INSTANCE.clean();
-            HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
+    private void interval() {
+        if (partialResult == null || partialResult.isEmpty()) {
+            partialResult = " ";
         }
+        
+        HudTexts.text = VersionDifferences.translatableComponent(
+                "hud.text_chat.status.rec_msg",
+                (
+                        isRecording
+                        ? VersionDifferences.translatableComponent("hud.text_chat.status.ing", addCursor(partialResult))
+                        : VersionDifferences.translatableComponent("hud.text_chat.status.ready")
+                ),
+                recognizationMode.getName()
+        );
+        
+        LOGGER.debug("Synchronized Partial Result ‘{}’ to HUD.", partialResult);
     }
     
     private String selectResult() {
@@ -224,7 +227,7 @@ public class RecognizationManager extends Thread {
     public void clean() {
         LOGGER.info("Cleaning up Recognization Manager.");
         isFinished = true;
-        HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.disabled");
+        HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.disabled");
         
         try {
             recognizationThread.join();
@@ -238,11 +241,11 @@ public class RecognizationManager extends Thread {
     
     @SuppressWarnings("BusyWait")
     private void recognize() {
-        try (TargetDataLine line = (TargetDataLine) AudioSystem.getLine(info)) {
+        try (TargetDataLine line = (TargetDataLine) MicrophoneManager.getMixer().getLine(info)) {
             line.open(audioFormat);
             line.start();
             
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[Config.getBufferLength()];
             while (true) {
                 if (isFinished) return;
                 if (!isRecording) {
@@ -289,7 +292,7 @@ public class RecognizationManager extends Thread {
             }
         } catch (LineUnavailableException e) {
             SimpleTextChat.LOGGER.error("Audio line not available.", e);
-            HudTexts.text = VersionDifferences.translatable("hud.text_chat.status.line_unavailable").withStyle(ChatFormatting.RED);
+            HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.line_unavailable").withStyle(ChatFormatting.RED);
         } finally {
             recognizer.close();
             model.close();
@@ -329,5 +332,10 @@ public class RecognizationManager extends Thread {
         if (s.isEmpty()) return "";
         if (s.length() == 1) return s.toUpperCase();
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+    
+    private void refreshInfo() {
+        audioFormat = new AudioFormat(Config.getSampleRate(), 16, 1, true, false);
+        info = new DataLine.Info(TargetDataLine.class, audioFormat);
     }
 }

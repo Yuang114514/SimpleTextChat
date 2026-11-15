@@ -35,6 +35,25 @@
 	"gui.text_chat.setup.complete.error.failed_to_config": "写入配置失败。",
 	"gui.text_chat.setup.complete.tooltip.need_verify": "需要验证！",
 
+	"gui.text_chat.advanced_config.title": "高级设置",
+	"gui.text_chat.advanced_config.warn": "警告：更改这些设置可能导致性能问题。",
+
+	"gui.text_chat.advanced_config.microphone.name": "麦克风",
+
+	"gui.text_chat.advanced_config.dictionary.tooltip": "设置模型的词典。\n在小模型上词典会完全替换输出，而在大模型上词典一点用都没有。 ^(-_-)^",
+
+	"gui.text_chat.advanced_config.sample_rate": "音频采样率",
+	"gui.text_chat.advanced_config.buffer_length": "缓冲区长度",
+
+	"gui.simple_text_chat.microphone.tag.virtual": "[虚拟] ",
+	"gui.simple_text_chat.microphone.tag.loopback": "[内录] ",
+	"gui.simple_text_chat.microphone.tag.hardware": "[硬件] ",
+	"gui.simple_text_chat.microphone.tag.default": "[默认] ",
+	"gui.simple_text_chat.microphone.none": "[未找到麦克风]",
+
+	"gui.text_chat.advanced_config.complete": "保存并退出",
+	"gui.text_chat.advanced_config.complete.json_syntax_error": "JSON 数组结构不合法！",
+	
 	"enum.text_chat.modes.hold_to_speak": "切换说话",
 	"enum.text_chat.modes.hold_to_speak.tooltip": "按一下 功能键 开始说话，再按一下发送。",
 	"enum.text_chat.modes.press_send": "按键发送",
@@ -46,12 +65,12 @@
 	"enum.text_chat.langs.english": "英文",
 
 	"hud.text_chat.status.disabled": "简单的文本聊天 未启用",
-	"hud.text_chat.status.preparing": "准备中... | 模型：%s | 模式：%s",
+	"hud.text_chat.status.preparing": "准备中... | 模型：%s | 模式：%s | 麦克风：%s",
 	"hud.text_chat.status.ready": "识别就绪",
 	"hud.text_chat.status.closing": "关闭中...",
 	"hud.text_chat.status.setup_failed": "初始化识别器失败",
 	"hud.text_chat.status.line_unavailable": "音频输入流不可用",
-	"hud.text_chat.status.rec_msg": "%s | 模型：%s | 模式：%s",
+	"hud.text_chat.status.rec_msg": "%s | 模式：%s",
 	"hud.text_chat.status.ing": "识别中：%s",
 
 	"modmenu.nameTranslation.text_chat": "简单的文本聊天",

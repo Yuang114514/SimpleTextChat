@@ -4,7 +4,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 public class VersionDifferences {
-    public static MutableComponent translatable(String key, Object... args) {
+    public static MutableComponent translatableComponent(String key, Object... args) {
         return Component.translatable(key, args);
+    }
+    
+    public static MutableComponent literalComponent(String s) {
+        return Component.literal(s);
     }
 }

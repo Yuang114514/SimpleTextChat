@@ -35,6 +35,25 @@
 	"gui.text_chat.setup.complete.error.failed_to_config": "Failed to store into Config.",
 	"gui.text_chat.setup.complete.tooltip.need_verify": "Need Verifying!",
 
+	"gui.text_chat.advanced_config.title": "Advanced Config",
+	"gui.text_chat.advanced_config.warn": "WARNING: Changing these configuration may cause performance problems.",
+
+	"gui.text_chat.advanced_config.microphone.name": "Microphone",
+
+	"gui.text_chat.advanced_config.dictionary.tooltip": "Set model's dictionary.\nOn small models it will replace output, and on big models it is no effect at all. ^(-_-)^",
+
+	"gui.text_chat.advanced_config.sample_rate": "Sample Rate",
+	"gui.text_chat.advanced_config.buffer_length": "Buffer Length",
+
+	"gui.simple_text_chat.microphone.tag.virtual": "[Virtual] ",
+	"gui.simple_text_chat.microphone.tag.loopback": "[Loopback] ",
+	"gui.simple_text_chat.microphone.tag.hardware": "[Hardware] ",
+	"gui.simple_text_chat.microphone.tag.default": "[Default] ",
+	"gui.simple_text_chat.microphone.none": "[Microphone not Found]",
+
+	"gui.text_chat.advanced_config.complete": "Save and Exit",
+	"gui.text_chat.advanced_config.complete.json_syntax_error": "Not a valid JSON Array!",
+
     "enum.text_chat.modes.hold_to_speak": "Toggle Key to Speak",
     "enum.text_chat.modes.hold_to_speak.tooltip": "Press the Function Key once to recognize, then press it again to send message.",
     "enum.text_chat.modes.press_send": "Press Key to Send",
@@ -46,12 +65,12 @@
 	"enum.text_chat.langs.english": "English",
 
     "hud.text_chat.status.disabled": "Simple Text Chat Inactive",
-    "hud.text_chat.status.preparing": "Preparing... | Model: %s | Mode: %s",
+    "hud.text_chat.status.preparing": "Preparing... | Model: %s | Mode: %s | Microphone: %s",
     "hud.text_chat.status.ready": "Recognization Ready",
     "hud.text_chat.status.closing": "Closing...",
     "hud.text_chat.status.setup_failed": "Failed to setup recognizer.",
     "hud.text_chat.status.line_unavailable": "Audio Line Unavaliable",
-	"hud.text_chat.status.rec_msg": "%s | Model: %s | Mode: %s",
+	"hud.text_chat.status.rec_msg": "%s | Mode: %s",
 	"hud.text_chat.status.ing": "Recognizing：%s",
 
     "modmenu.nameTranslation.text_chat": "Simple Text Chat",
