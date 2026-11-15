@@ -1,0 +1,65 @@
+{
+    "jfrConfig": {
+        "settings": "profile"
+    },
+    "asyncProfilerConfig": {
+        "jfrsync": true,
+        "alloc": true,
+        "event": "wall",
+        "misc": ""
+    },
+    "file": "$PROJECT_DIR/profile.jfr",
+    "conversionConfig": {
+        "nonProjectPackagePrefixes": [
+            "java.",
+            "javax.",
+            "kotlin.",
+            "jdk.",
+            "com.google.",
+            "org.apache.",
+            "org.spring.",
+            "sun.",
+            "scala."
+        ],
+        "enableMarkers": true,
+        "initialVisibleThreads": 10,
+        "initialSelectedThreads": 10,
+        "includeGCThreads": false,
+        "includeInitialSystemProperty": false,
+        "includeInitialEnvironmentVariables": false,
+        "includeSystemProcesses": false,
+        "ignoredEvents": [
+            "jdk.UnsignedLongFlag",
+            "jdk.UnsignedIntFlag",
+            "jdk.ActiveSetting",
+            "jdk.InitialSystemProperty",
+            "jdk.SystemProcess",
+            "jdk.BooleanFlag",
+            "jdk.InitialEnvironmentVariable",
+            "jdk.ModuleRequire",
+            "jdk.LongFlag",
+            "jdk.DoubleFlag",
+            "jdk.StringFlag",
+            "jdk.IntFlag",
+            "jdk.ModuleExport",
+            "jdk.ActiveRecording",
+            "jdk.NativeLibrary"
+        ],
+        "minRequiredItemsPerThread": 3
+    },
+    "defaultViewer": "FIREFOX_PROFILER",
+    "additionalGradleTargets": [
+        {
+            "targetPrefix": "quarkus",
+            "optionForVmArgs": "-Djvm.args",
+            "description": "Example quarkus config, adding profiling arguments via -Djvm.args option to the Gradle task run"
+        }
+    ],
+    "additionalMavenTargets": [
+        {
+            "targetPrefix": "quarkus:",
+            "optionForVmArgs": "-Djvm.args",
+            "description": "Example quarkus config, adding profiling arguments via -Djvm.args option to the Maven goal run"
+        }
+    ]
+}
