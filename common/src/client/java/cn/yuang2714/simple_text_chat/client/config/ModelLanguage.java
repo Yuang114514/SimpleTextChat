@@ -14,6 +14,6 @@ public enum ModelLanguage {
     }
     
     public MutableComponent getName() {
-        return VersionDifferences.translatable("enum.text_chat.langs." + name);
+        return VersionDifferences.translatableComponent("enum.text_chat.langs." + name);
     }
 }

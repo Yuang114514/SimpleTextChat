@@ -1,6 +1,7 @@
 package cn.yuang2714.simple_text_chat.client.config;
 
 import cn.yuang2714.simple_text_chat.client.core.FileUtils;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
@@ -17,11 +18,24 @@ public class Config {
     private static final String defaultJson = """
             {
                 "setup": false,
+                "modelFolder": "",
                 "recognizationMode":"AUTO_DETECT",
                 "recognizationLanguage":"ENGLISH",
-                "modelDictionary":[]
+                "modelDictionary":[],
+                "microphoneName":""
+                "sampleRate":44100.0
+                "bufferLength":4096
             }
             """;
+    
+    private static final String SETUP = "setup";
+    private static final String MODEL_FOLDER = "modelFolder";
+    private static final String RECOGNIZATION_MODE = "recognizationMode";
+    private static final String RECOGNIZATION_LANGUAGE = "recognizationLanguage";
+    private static final String MODEL_DICTIONARY = "modelDictionary";
+    private static final String MICROPHONE_NAME = "microphoneName";
+    private static final String SAMPLE_RATE = "sampleRate";
+    private static final String BUFFER_LENGTH = "bufferLength";
 
     public static void init() throws Exception {
         try {
@@ -37,13 +51,9 @@ public class Config {
         }
     }
     
-    public static Path getModelStorageFolder() throws Exception {
+    public static Path getModelStorageFolder() {
         return Path.of(
-                JsonParser
-                        .parseString(FileUtils.read(configFile))
-                        .getAsJsonObject()
-                        .get("modelFolder")
-                        .getAsString()
+                get(MODEL_FOLDER, "")
                         .replace(
                                 "${GAME_DIR}",
                                 FabricLoader.getInstance().getGameDir().toAbsolutePath().toString()
@@ -51,91 +61,119 @@ public class Config {
         );
     }
     
-    public static void setModelStorageFolder(Path modelStorageFolder) throws Exception {
-        JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
-        
-        if (content.has("modelFolder")) {
-            content.remove("modelFolder");
-        }
-        
-        content.addProperty(
-                "modelFolder",
+    public static void setModelStorageFolder(Path modelStorageFolder) {
+        set(
+                MODEL_FOLDER,
                 modelStorageFolder
                         .toAbsolutePath()
                         .toString()
-                        .replace(FabricLoader.getInstance().getGameDir().toAbsolutePath().toString(), "${GAME_DIR}")
+                        .replace(
+                                FabricLoader.getInstance().getGameDir().toAbsolutePath().toString(),
+                                "${GAME_DIR}"
+                        )
         );
-        FileUtils.write(content.toString(), configFile);
     }
     
-    public static RecognizationMode getMode() throws Exception {
-        return RecognizationMode.valueOf(JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("recognizationMode").getAsString());
+    public static RecognizationMode getMode() {
+        return RecognizationMode.valueOf(get(RECOGNIZATION_MODE, RecognizationMode.AUTO_DETECT.name));
     }
     
-    public static void setMode(RecognizationMode recognizationMode) throws Exception {
-        JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
-        
-        if (content.has("recognizationMode")) {
-            content.remove("recognizationMode");
-        }
-        
-        content.addProperty("recognizationMode", recognizationMode.toString());
-        FileUtils.write(content.toString(), configFile);
+    public static void setMode(RecognizationMode recognizationMode) {
+        set(RECOGNIZATION_MODE, recognizationMode.toString());
     }
     
-    public static boolean isSetup() throws Exception {
+    public static boolean isSetup() {
+        return get(SETUP, false);
+    }
+    
+    public static void setSetup(boolean setup) {
+        set(SETUP, setup);
+    }
+    
+    public static ModelLanguage getModelLanguage() {
+        return ModelLanguage.valueOf(get(RECOGNIZATION_LANGUAGE, ModelLanguage.CHINESE.name));
+    }
+    
+    public static void setModelLanguage(ModelLanguage language) {
+        set(RECOGNIZATION_LANGUAGE, language.toString());
+    }
+    
+    public static Optional<String> getModelDictionary() {
+        String value = get(MODEL_DICTIONARY, "[]");
+        if (value.equals("[]")) return Optional.empty();
+        else return Optional.of(value);
+    }
+    
+    public static void setModelDictionary(String dict) {
+        set(MODEL_DICTIONARY, dict);
+    }
+    
+    public static String getMicrophoneName() {
+        return get(MICROPHONE_NAME, "DEFAULT");
+    }
+    
+    public static void setMicrophoneName(String name) {
+        set(MICROPHONE_NAME, name);
+    }
+    
+    public static float getSampleRate() {
+        return get(SAMPLE_RATE, 44100.0f);
+    }
+    
+    public static void setSampleRate(float rate) {
+        set(SAMPLE_RATE, rate);
+    }
+    
+    public static int getBufferLength() {
+        return get(BUFFER_LENGTH, 8192);
+    }
+    
+    public static void setBufferLength(int length) {
+        set(BUFFER_LENGTH, length);
+    }
+    
+    private static <T> T get(String key, T def) {
         try {
-            return JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("setup").getAsBoolean();
-        } catch (NullPointerException _) {
-            return false;
+            JsonElement element = JsonParser.parseString(FileUtils.read(configFile))
+                                            .getAsJsonObject()
+                                            .get(key);
+            
+            if (element == null || element.isJsonNull()) {
+                return def;
+            }
+            
+            return (T) switch (def) {
+                case String _ -> element.getAsString();
+                case Boolean _ -> element.getAsBoolean();
+                case Integer _ -> element.getAsInt();
+                case Float _ -> element.getAsFloat();
+                default -> throw new IllegalStateException("Unexpected type: " + def);
+            };
+        } catch (Throwable e) {
+            LOGGER.warn("Failed to get config {}. returning default value {}.", key, def, e);
+            return def;
         }
     }
     
-    public static void setSetup(boolean setup) throws Exception {
-        JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
-        
-        if (content.has("setup")) {
-            content.remove("setup");
-        }
-        
-        content.addProperty("setup", setup);
-        FileUtils.write(content.toString(), configFile);
-    }
-    
-    public static ModelLanguage getModelLanguage() throws Exception {
-        return ModelLanguage.valueOf(JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("recognizationLanguage").getAsString());
-    }
-    
-    public static void setModelLanguage(ModelLanguage language) throws Exception {
-        JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
-        
-        if (content.has("recognizationLanguage")) {
-            content.remove("recognizationLanguage");
-        }
-        
-        content.addProperty("recognizationLanguage", language.toString());
-        FileUtils.write(content.toString(), configFile);
-    }
-    
-    public static Optional<String> getModelDictionary() throws Exception {
+    private static <T> void set(String key, T value) {
         try {
-            String value = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject().get("modelDictionary")
-                                     .getAsJsonArray().toString();
-            if (value.equals("[]")) return Optional.empty();
-            else return Optional.of(value);
-        } catch (NullPointerException e) {
-            return Optional.empty();
+            JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
+            
+            if (content.has(key)) {
+                content.remove(key);
+            }
+            
+            switch (value) {
+                case String s -> content.addProperty(key, s);
+                case Boolean b -> content.addProperty(key, b);
+                case Integer i -> content.addProperty(key, i);
+                case Float f -> content.addProperty(key, f);
+                case null, default -> throw new RuntimeException("Unsupported type!");
+            }
+            
+            FileUtils.write(content.toString(), configFile);
+        } catch (Throwable e) {
+            LOGGER.error("Failed to set into config during setting key {}.", key, e);
         }
-    }
-    
-    public static void setModelDictionary(String dict) throws Exception {
-        JsonObject content = JsonParser.parseString(FileUtils.read(configFile)).getAsJsonObject();
-        
-        if (content.has("modelDictionary")) {
-            content.remove("modelDictionary");
-        }
-        
-        content.addProperty("modelDictionary", dict);
-        FileUtils.write(content.toString(), configFile);
     }
 }

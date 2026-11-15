@@ -15,10 +15,10 @@ public enum RecognizationMode {
     }
     
     public MutableComponent getName() {
-        return VersionDifferences.translatable("enum.text_chat.modes." + name);
+        return VersionDifferences.translatableComponent("enum.text_chat.modes." + name);
     }
     
     public MutableComponent getTooltip() {
-        return VersionDifferences.translatable("enum.text_chat.modes." + name + ".tooltip");
+        return VersionDifferences.translatableComponent("enum.text_chat.modes." + name + ".tooltip");
     }
 }
