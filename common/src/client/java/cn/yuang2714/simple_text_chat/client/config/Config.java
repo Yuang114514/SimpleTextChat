@@ -22,8 +22,8 @@ public class Config {
                 "recognizationMode":"AUTO_DETECT",
                 "recognizationLanguage":"ENGLISH",
                 "modelDictionary":[],
-                "microphoneName":""
-                "sampleRate":44100.0
+                "microphoneName":"",
+                "sampleRate":44100.0,
                 "bufferLength":4096
             }
             """;
