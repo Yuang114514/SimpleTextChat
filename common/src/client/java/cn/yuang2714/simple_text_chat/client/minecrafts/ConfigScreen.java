@@ -236,7 +236,7 @@ public class ConfigScreen extends Screen {
                 ).tooltip(
                         Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.complete.tooltip"))
                 ).bounds(
-                        START_X + 200,
+                        START_X + 202,
                         START_Y + 160,
                         198,
                         20
