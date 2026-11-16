@@ -101,14 +101,12 @@ public class AdvancedConfigScreen extends Screen {
                 );
         addRenderableWidget(microphones);
         
-        dict = new MultiLineEditBox(
+        dict = MinecraftVersionHelper.HELPER.createMultiLineEditBox(
                 font,
                 startX,
                 startY + 25,
                 400,
-                100,
-                Component.empty(),
-                Component.empty()
+                100
         );
         dict.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.advanced_config.dictionary.tooltip")));
         dict.setValue(Config.getModelDictionary().orElse("[]"));

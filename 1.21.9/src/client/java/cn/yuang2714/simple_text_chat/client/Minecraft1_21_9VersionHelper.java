@@ -9,7 +9,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -80,5 +82,11 @@ public class Minecraft1_21_9VersionHelper implements IMinecraftVersionHelper {
                 ResourceLocation.fromNamespaceAndPath(SimpleTextChat.MOD_ID, "message_hud"),
                 (graphics, delta) -> HudTexts.onHudRender(graphics)
         );
+    }
+    
+    @Override
+    public MultiLineEditBox createMultiLineEditBox(Font font, int x, int y, int width, int height) {
+        return MultiLineEditBox.builder()
+                .setX(x).setY(y).build(font, width, height, Component.empty());
     }
 }

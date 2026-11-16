@@ -8,7 +8,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -70,5 +72,18 @@ public class Minecraft1_20_5VersionHelper implements IMinecraftVersionHelper {
     @Override
     public void registerHud() {
         HudRenderCallback.EVENT.register((graphics, delta) -> HudTexts.onHudRender(graphics));
+    }
+    
+    @Override
+    public MultiLineEditBox createMultiLineEditBox(Font font, int x, int y, int width, int height) {
+        return new MultiLineEditBox(
+                font,
+                x,
+                y,
+                width,
+                height,
+                Component.empty(),
+                Component.empty()
+        );
     }
 }
