@@ -3,6 +3,7 @@ package cn.yuang2714.simple_text_chat.client.minecrafts;
 import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.config.ModelLanguage;
 import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
+import cn.yuang2714.simple_text_chat.client.core.MicrophoneManager;
 import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -14,8 +15,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Style;
 import org.vosk.Model;
 
+import javax.sound.sampled.Mixer;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
@@ -26,6 +29,7 @@ public class ConfigScreen extends Screen {
     private EditBox modelPath;
     private CycleButton<RecognizationMode> modes;
     private CycleButton<ModelLanguage> languages;
+    private CycleButton<Mixer.Info> microphones;
     private Button verify;
     private Button saveAndExit;
     private String lastModelPath;
@@ -201,6 +205,28 @@ public class ConfigScreen extends Screen {
         languages.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.lang.tooltip")));
         addRenderableWidget(languages);
         
+        
+        List<Mixer.Info> microphoneList = MicrophoneManager.listMixers(true);
+        microphones = MinecraftVersionHelper.HELPER.cycleButtonBuilder(
+                MicrophoneManager::getDisplayName,
+                MicrophoneManager
+                        .getMicrophoneFromConfig(microphoneList).orElse(microphoneList.getFirst())
+                ).withTooltip(
+                        info -> Tooltip.create(
+                                MicrophoneManager.getDisplayName(info))
+                ).withValues(
+                        microphoneList
+                ).create(
+                        START_X,
+                        START_Y,
+                        400,
+                        20,
+                        VersionDifferences.translatableComponent("gui.text_chat.advanced_config.microphone.name"),
+                        (cycleButton, value) -> cycleButton.setTooltip(Tooltip.create(
+                                MicrophoneManager.getDisplayName(value)))
+                );
+        addRenderableWidget(microphones);
+        
         addRenderableWidget(
                 Button.builder(
                         VersionDifferences.translatableComponent("gui.text_chat.advanced_config.title"),
@@ -288,6 +314,7 @@ public class ConfigScreen extends Screen {
             Config.setMode(modes.getValue());
             Config.setModelStorageFolder(Paths.get(modelPath.getValue()));
             Config.setModelLanguage(languages.getValue());
+            Config.setMicrophoneName(microphones.getValue().getName());
         } catch (Exception e) {
             LOGGER.error("Failed to storage into Config.", e);
             button.setMessage(VersionDifferences.translatableComponent("gui.text_chat.setup.complete.error.failed_to_config"));

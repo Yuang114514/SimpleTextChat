@@ -1,6 +1,7 @@
 package cn.yuang2714.simple_text_chat.client.config;
 
 import cn.yuang2714.simple_text_chat.client.core.FileUtils;
+import cn.yuang2714.simple_text_chat.client.core.RecognizationManager;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -122,6 +123,7 @@ public class Config {
     
     public static void setSampleRate(float rate) {
         set(SAMPLE_RATE, rate);
+        RecognizationManager.refreshInfo();
     }
     
     public static int getBufferLength() {

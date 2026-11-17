@@ -18,13 +18,22 @@ public class MicrophoneManager {
             "MICROPHONE NOT FOUND"
     ) {};
     
-    public static List<Mixer.Info> listMixers() {
-        List<Mixer.Info> rawList = List.of(AudioSystem.getMixerInfo());
+    public static List<Mixer.Info> infoCache = new ArrayList<>(List.of(AudioSystem.getMixerInfo()));
+    
+    public static void refreshCache() {
+        infoCache = new ArrayList<>(List.of(AudioSystem.getMixerInfo()));
+    }
+    
+    public static List<Mixer.Info> listMixers(boolean strictForceRealTimeInfo) {
+        List<Mixer.Info> rawList = strictForceRealTimeInfo ? List.of(AudioSystem.getMixerInfo()) : infoCache;
+        
+        //顺便更新缓存
+        if (strictForceRealTimeInfo) refreshCache();
         
         StringBuilder rawBuilder = new StringBuilder();
         
         List<Mixer.Info> infoList =
-                new ArrayList<>(Arrays.stream(AudioSystem.getMixerInfo())
+                new ArrayList<>(rawList.stream()
                                       .peek(info -> rawBuilder.append(info.getName()).append("\n"))
                                       .filter(info -> { //只保留麦克风
                                           Mixer mixer = AudioSystem.getMixer(info);
@@ -43,9 +52,7 @@ public class MicrophoneManager {
                         .collect(Collectors.joining("\n"))
         );
         
-        if (infoList.isEmpty()) {
-            infoList.add(EMPTY);
-        }
+        if (infoList.isEmpty()) infoList.add(EMPTY);
         
         return infoList;
     }
@@ -97,19 +104,19 @@ public class MicrophoneManager {
         if (mixers.isEmpty()) return Optional.empty();
         
         return mixers.stream()
-                     .filter(info -> microphoneName.equals(info.getName()))
+                     .filter(info -> Objects.equals(microphoneName, info.getName()))
                      .findFirst()
                      .or(() -> {
                          SimpleTextChat.LOGGER.warn("Selected microphone not found, falling back to default. Configured: {}", microphoneName);
-                         
                          return Optional.of(mixers.getFirst());
                      });
     }
     
     public static Mixer getMixer() {
-        List<Mixer.Info> infoList = listMixers();
+        List<Mixer.Info> infoList = listMixers(true);
         
-        return AudioSystem.getMixer(getMicrophoneFromConfig(listMixers()).orElseGet(() -> {
+        return AudioSystem.getMixer(getMicrophoneFromConfig(infoList).orElseGet(() -> {
+            //第一个必是默认
             SimpleTextChat.LOGGER.warn("Configured microphone not found, selecting default.");
             return infoList.getFirst();
         }));
