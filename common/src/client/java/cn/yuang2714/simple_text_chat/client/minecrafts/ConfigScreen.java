@@ -7,10 +7,9 @@ import cn.yuang2714.simple_text_chat.client.core.MicrophoneManager;
 import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.CycleButton;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Style;
 import org.vosk.Model;
@@ -23,8 +22,6 @@ import java.util.List;
 import static cn.yuang2714.simple_text_chat.SimpleTextChat.LOGGER;
 
 public class ConfigScreen extends Screen {
-    private int START_X;
-    private int START_Y;
     private final Screen parentScreen;
     private EditBox modelPath;
     private CycleButton<RecognizationMode> modes;
@@ -79,73 +76,44 @@ public class ConfigScreen extends Screen {
                 0xFF_FF_FF_FF,
                 true
         );
-        
-        graphics.drawString(
-                font,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_1"),
-                width / 2 - font.width(VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_1")) / 2,
-                START_Y,
-                0xFF_FF_FF_FF,
-                true
-        );
-        
-        graphics.drawString(
-                font,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_2"),
-                width / 2 - font.width(VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_2")) / 2,
-                START_Y + 10,
-                0xFF_FF_FF_FF,
-                true
-        );
-        
-        graphics.drawString(
-                font,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_3"),
-                width / 2 - font.width(VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_3")) / 2,
-                START_Y + 20,
-                0xFF_FF_FF_FF,
-                true
-        );
-        
-        graphics.drawString(
-                font,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_4"),
-                width / 2 - font.width(VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_4")) / 2,
-                START_Y + 30,
-                0xFF_FF_FF_FF,
-                true
-        );
-        
-        graphics.drawString(
-                font,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_5"),
-                width / 2 - font.width(VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_5")) / 2,
-                START_Y + 40,
-                0xFF_FF_FF_FF,
-                true
-        );
-        
-        graphics.drawString(
-                font,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.model.info"),
-                START_X,
-                START_Y + 65,
-                0xFF_FF_FF_FF,
-                true
-        );
     }
     
     @Override
     protected void init() {
-        START_X = width / 2 - 400 / 2;
-        START_Y = height / 2 - 170 / 2;
+        //setup layout
         
-        int modelPathTextWidth = font.width(VersionDifferences.translatableComponent("gui.text_chat.setup.model.info"));
+        //活了1145141919810年才知道的Layout
+        //Terry害我不浅啊
+        //竖排layout
+        LinearLayout layout = LinearLayout.vertical();
+        layout.defaultCellSetting().alignHorizontallyCenter().paddingTop(5);
+        
+        //description
+        LinearLayout description = LinearLayout.vertical();
+        description.defaultCellSetting().paddingBottom(2).alignHorizontallyCenter();
+        
+        for (int i = 1; i <= 5; i++) description.addChild(
+                new StringWidget(
+                        VersionDifferences.translatableComponent("gui.text_chat.setup.description.line_" + i),
+                        font
+                ));
+        
+        layout.addChild(description, settings -> settings.paddingBottom(20));
+        
+        LinearLayout modelLine = LinearLayout.horizontal();
+        modelLine.defaultCellSetting().padding(2).alignVerticallyMiddle();
+        
+        modelLine.addChild(
+                new StringWidget(
+                        VersionDifferences.translatableComponent("gui.text_chat.setup.model.info"),
+                        font
+                )
+        );
+        
         modelPath = new EditBox(
                 font,
-                START_X + modelPathTextWidth + 5,
-                START_Y + 60,
-                295 - modelPathTextWidth,
+                0,0,
+                295 - font.width(VersionDifferences.translatableComponent("gui.text_chat.setup.model.info")),
                 20,
                 VersionDifferences.translatableComponent("gui.text_chat.setup.model.info")
         );
@@ -154,21 +122,22 @@ public class ConfigScreen extends Screen {
         modelPath.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.model_path.tooltip")));
         modelPath.setResponder(this::onModelPathChange);
         
-        addRenderableWidget(modelPath);
+        modelLine.addChild(modelPath);
         
-        addRenderableWidget(
+        modelLine.addChild(
                 Button.builder(
                         VersionDifferences.translatableComponent("gui.text_chat.setup.model.download_button_text"),
                         ignored -> MinecraftVersionHelper.HELPER.openUri("https://alphacephei.com/vosk/models")
                 ).bounds(
-                        START_X + 305,
-                        START_Y + 60,
+                        0,0,
                         95,
                         20
                 ).tooltip(
                         Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.model.tooltip"))
                 ).build()
         );
+        modelLine.arrangeElements();
+        layout.addChild(modelLine);
         
         modes = MinecraftVersionHelper.HELPER.cycleButtonBuilder(
                 recognizationMode -> recognizationMode.getName().setStyle(Style.EMPTY.withHoverEvent(
@@ -177,8 +146,7 @@ public class ConfigScreen extends Screen {
         ).withValues(
                 RecognizationMode.values()
         ).create(
-                START_X,
-                START_Y + 85,
+                0,0,
                 400,
                 20,
                 VersionDifferences.translatableComponent("gui.text_chat.setup.mode.info"),
@@ -186,7 +154,7 @@ public class ConfigScreen extends Screen {
                         button.setTooltip(Tooltip.create(recognizationMode.getTooltip()))
         );
         modes.setTooltip(Tooltip.create(lastRecognizationMode.getTooltip()));
-        addRenderableWidget(modes);
+        layout.addChild(modes);
         
         languages = MinecraftVersionHelper.HELPER.cycleButtonBuilder(
                 ModelLanguage::getName,
@@ -194,8 +162,7 @@ public class ConfigScreen extends Screen {
         ).withValues(
                 ModelLanguage.values()
         ).create(
-                START_X,
-                START_Y + 110,
+                0,0,
                 400,
                 20,
                 VersionDifferences.translatableComponent("gui.text_chat.setup.lang.info"),
@@ -203,7 +170,7 @@ public class ConfigScreen extends Screen {
                         button.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.lang.tooltip")))
         );
         languages.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.lang.tooltip")));
-        addRenderableWidget(languages);
+        layout.addChild(languages);
         
         
         List<Mixer.Info> microphoneList = MicrophoneManager.listMixers(true);
@@ -217,57 +184,64 @@ public class ConfigScreen extends Screen {
                 ).withValues(
                         microphoneList
                 ).create(
-                        START_X,
-                        START_Y,
+                        0,0,
                         400,
                         20,
                         VersionDifferences.translatableComponent("gui.text_chat.advanced_config.microphone.name"),
                         (cycleButton, value) -> cycleButton.setTooltip(Tooltip.create(
                                 MicrophoneManager.getDisplayName(value)))
                 );
-        addRenderableWidget(microphones);
+        layout.addChild(microphones);
         
-        addRenderableWidget(
+        layout.addChild(
                 Button.builder(
                         VersionDifferences.translatableComponent("gui.text_chat.advanced_config.title"),
                         ignored -> MinecraftVersionHelper.HELPER.setScreen(new AdvancedConfigScreen(this))
                 ).tooltip(
                         Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.advanced_config.warn"))
                 ).bounds(
-                        START_X,
-                        START_Y + 135,
+                        0,0,
                         400,
                         20
                 ).build()
         );
         
-        verify = addRenderableWidget(
+        LinearLayout exitRow = LinearLayout.horizontal();
+        exitRow.defaultCellSetting().padding(2);
+        
+        verify = exitRow.addChild(
                 Button.builder(
                         VersionDifferences.translatableComponent("gui.text_chat.setup.verify"),
                         this::verify
                 ).tooltip(
                         Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.verify.tooltip"))
                 ).bounds(
-                        START_X,
-                        START_Y + 160,
+                        0,0,
                         198,
                         20
                 ).build()
         );
         
-        saveAndExit = addRenderableWidget(
+        saveAndExit = exitRow.addChild(
                 Button.builder(
                         VersionDifferences.translatableComponent("gui.text_chat.setup.complete"),
                         this::saveAndExit
                 ).tooltip(
                         Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.complete.tooltip"))
                 ).bounds(
-                        START_X + 202,
-                        START_Y + 160,
+                        0,0,
                         198,
                         20
                 ).build()
         );
+        
+        exitRow.arrangeElements();
+        layout.addChild(exitRow);
+        
+        layout.arrangeElements();
+        layout.visitWidgets(this::addRenderableWidget);
+        
+        FrameLayout.centerInRectangle(layout, getRectangle());
     }
     
     @Override
