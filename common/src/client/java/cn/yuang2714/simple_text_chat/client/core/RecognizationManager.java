@@ -84,7 +84,7 @@ public class RecognizationManager extends Thread {
         try {
             model = Config.getModelStorageFolder().getFileName().toString();
             mode = Config.getMode().getName();
-            microphoneName = MicrophoneManager.getDisplayName(MicrophoneManager.getMicrophoneFromConfig(MicrophoneManager.listMixers()).orElseThrow());
+            microphoneName = MicrophoneManager.getDisplayName(MicrophoneManager.getMicrophoneFromConfig(MicrophoneManager.listMixers(false)).orElseThrow());
         } catch (Exception e) {
             LOGGER.error("Failed to initialize Recognization Manager.", e);
             HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
@@ -334,7 +334,7 @@ public class RecognizationManager extends Thread {
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
     
-    private void refreshInfo() {
+    public static void refreshInfo() {
         audioFormat = new AudioFormat(Config.getSampleRate(), 16, 1, true, false);
         info = new DataLine.Info(TargetDataLine.class, audioFormat);
     }

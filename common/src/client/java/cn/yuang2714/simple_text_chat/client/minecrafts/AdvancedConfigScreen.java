@@ -1,24 +1,23 @@
 package cn.yuang2714.simple_text_chat.client.minecrafts;
 
 import cn.yuang2714.simple_text_chat.client.config.Config;
-import cn.yuang2714.simple_text_chat.client.core.MicrophoneManager;
 import cn.yuang2714.simple_text_chat.client.mcver.MinecraftVersionHelper;
 import com.google.gson.JsonParser;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.MultiLineEditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
-import javax.sound.sampled.Mixer;
-import java.util.List;
 import java.util.stream.StreamSupport;
 
 public class AdvancedConfigScreen extends Screen {
     private int startX, startY;
     private final ConfigScreen parent;
     private MultiLineEditBox dict;
-    private CycleButton<Mixer.Info> microphones;
     private EditBox sampleRate;
     private EditBox bufferLength;
     
@@ -31,26 +30,6 @@ public class AdvancedConfigScreen extends Screen {
     protected void init() {
         startX = width / 2 - 400 / 2;
         startY = height / 2 - 215 / 2;
-        
-        List<Mixer.Info> microphoneList = MicrophoneManager.listMixers();
-        
-        microphones = CycleButton
-                .builder(
-                        MicrophoneManager::getDisplayName,
-                        MicrophoneManager.getMicrophoneFromConfig(microphoneList).orElse(microphoneList.getFirst())
-                ).withTooltip(
-                        info -> Tooltip.create(MicrophoneManager.getDisplayName(info))
-                ).withValues(
-                        microphoneList
-                ).create(
-                        startX,
-                        startY,
-                        400,
-                        20,
-                        VersionDifferences.translatableComponent("gui.text_chat.advanced_config.microphone.name"),
-                        (cycleButton, value) -> cycleButton.setTooltip(Tooltip.create(MicrophoneManager.getDisplayName(value)))
-                );
-        addRenderableWidget(microphones);
         
         dict = MultiLineEditBox
                 .builder()
@@ -74,6 +53,7 @@ public class AdvancedConfigScreen extends Screen {
                 20,
                 Component.empty()
         );
+        sampleRate.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.advanced_config.sample_rate.tooltip")));
         sampleRate.setValue(String.valueOf(Config.getSampleRate()));
         addRenderableWidget(sampleRate);
         
@@ -143,8 +123,6 @@ public class AdvancedConfigScreen extends Screen {
         }
         
         Config.setModelDictionary(dict.getValue());
-        Config.setMicrophoneName(microphones.getValue().getName());
-        
         
         try {
             Config.setSampleRate(Float.parseFloat(sampleRate.getValue()));
