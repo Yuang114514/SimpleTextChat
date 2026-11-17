@@ -4,6 +4,8 @@
 
 A simple mod that allows you to chat with voices while playing by recognize your voice to chat messages.
 
+# **[招维护者！招维护者！招维护者！](https://github.com/Yuang114514/SimpleTextChat/issues/1)**
+
 ### Intention 初衷
 
 > “你可以一边玩一边说话，但不可以一边玩一边打字。”
@@ -74,4 +76,7 @@ sequenceDiagram
     deactivate h
 ```
 
-//made some changes
+### 分支规则
+
+先按loader分类，再按JDK需求排分支
+单个分支内采用common+子项目的方式
