@@ -46,11 +46,11 @@
 	"gui.text_chat.advanced_config.sample_rate.tooltip": "不是所有麦克风都支持自定义采样率！",
 	"gui.text_chat.advanced_config.buffer_length": "缓冲区长度",
 
-	"gui.simple_text_chat.microphone.tag.virtual": "[虚拟] ",
-	"gui.simple_text_chat.microphone.tag.loopback": "[内录] ",
-	"gui.simple_text_chat.microphone.tag.hardware": "[硬件] ",
-	"gui.simple_text_chat.microphone.tag.default": "[默认] ",
-	"gui.simple_text_chat.microphone.none": "[未找到麦克风]",
+	"gui.text_chat.microphone.tag.virtual": "[虚拟] ",
+	"gui.text_chat.microphone.tag.loopback": "[内录] ",
+	"gui.text_chat.microphone.tag.hardware": "[硬件] ",
+	"gui.text_chat.microphone.tag.default": "[默认] ",
+	"gui.text_chat.microphone.none": "[未找到麦克风]",
 
 	"gui.text_chat.advanced_config.complete": "保存并退出",
 	"gui.text_chat.advanced_config.complete.json_syntax_error": "JSON 数组结构不合法！",

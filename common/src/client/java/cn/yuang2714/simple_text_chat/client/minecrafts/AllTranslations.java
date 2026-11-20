@@ -5,7 +5,7 @@ import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -79,22 +79,22 @@ public enum AllTranslations implements Component {
     }
     
     @Override
-    public @NonNull Style getStyle() {
+    public @NotNull Style getStyle() {
         return msg.getStyle();
     }
     
     @Override
-    public @NonNull ComponentContents getContents() {
+    public @NotNull ComponentContents getContents() {
         return msg.getContents();
     }
     
     @Override
-    public @NonNull List<Component> getSiblings() {
+    public @NotNull List<Component> getSiblings() {
         return msg.getSiblings();
     }
     
     @Override
-    public @NonNull FormattedCharSequence getVisualOrderText() {
+    public @NotNull FormattedCharSequence getVisualOrderText() {
         return msg.getVisualOrderText();
     }
 }

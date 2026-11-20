@@ -20,9 +20,8 @@ public class AdvancedConfigScreen extends Screen {
     private EditBox bufferLength;
     
     public AdvancedConfigScreen(ConfigScreen parent) {
-        super(VersionDifferences.translatableComponent("gui.text_chat.advanced_config.title"));
-        this.parent = parent;
         super(AllTranslations.GUI_ADVANCED_CONFIG_TITLE);
+        this.parent = parent;
     }
     
     private static boolean verifyJsonArray(String text) {
