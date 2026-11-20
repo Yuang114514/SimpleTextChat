@@ -1,6 +1,7 @@
 package cn.yuang2714.simple_text_chat.client;
 
 import cn.yuang2714.simple_text_chat.ConfigInitializationFailedException;
+import cn.yuang2714.simple_text_chat.NoUnusedWarning;
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
 import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.core.RecognizationManager;
@@ -18,6 +19,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 public class SimpleTextChatCommon {
     public static boolean isDisabled = false;
     
+    @NoUnusedWarning
 	public static void onInitializeClient() {
         System.setProperty("jna.encoding", "UTF-8");
         
