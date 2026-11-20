@@ -2,6 +2,8 @@
 plugins {
     id 'net.fabricmc.fabric-loom-remap' version "1.19-SNAPSHOT" apply(false)
     id 'maven-publish'
+    id 'com.modrinth.minotaur' version '2.10.0' apply false
+    id 'net.darkhax.curseforgegradle' version '1.3.33' apply false
 }
 
 group = project.maven_group
@@ -140,3 +142,5 @@ subprojects { Project sub ->
         }
     }
 }
+
+apply from: 'publishing.gradle'

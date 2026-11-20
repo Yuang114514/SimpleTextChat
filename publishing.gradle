@@ -1,0 +1,217 @@
+import java.nio.charset.StandardCharsets
+
+// Publishes the jars in build/libs to Modrinth (Minotaur) and CurseForge (CurseForgeGradle).
+// CurseForge upload uses CurseForgeGradle's official upload API; CurseMaven
+// (https://www.cursemaven.com) is a read-only dependency repository and cannot upload.
+// Usage:
+//   ./gradlew publishMods
+//   ./gradlew publishMods -Ppublish_debug=true     // log metadata without uploading
+//   ./gradlew publishMods -Pchangelog="..."        // non-interactive changelog (CI)
+//   ./gradlew publishMods -PchangelogFile=notes.md // read the changelog from a file
+//
+// Tokens are read from (in order): secrets.json, environment variables, Gradle properties.
+// Never commit secrets.json; it is ignored by .gitignore.
+
+def secretsFile = rootProject.file('secrets.json')
+def secrets = [:]
+if (secretsFile.exists()) {
+    try {
+        secrets = new groovy.json.JsonSlurper().parse(secretsFile)
+    } catch (Exception e) {
+        throw new GradleException("Could not parse ${secretsFile.absolutePath}: ${e.message}", e)
+    }
+}
+if (!(secrets instanceof Map)) {
+    throw new GradleException("${secretsFile.absolutePath} must contain a JSON object.")
+}
+
+def asText = { Object value -> value == null ? '' : value.toString().trim() }
+def modrinthToken = asText(secrets.modrinth?.token ?: System.getenv('MODRINTH_TOKEN') ?: rootProject.findProperty('modrinth_token'))
+def curseforgeToken = asText(secrets.curseforge?.token ?: System.getenv('CURSEFORGE_TOKEN') ?: rootProject.findProperty('curseforge_token'))
+def modrinthProjectId = asText(rootProject.findProperty('modrinth_project_id') ?: 'liCRxar1')
+def curseforgeProjectId = asText(rootProject.findProperty('curseforge_project_id') ?: '1729865')
+def publishDebug = (rootProject.findProperty('publish_debug') ?: 'false').toString().toBoolean()
+def publishType = asText(rootProject.findProperty('publish_type') ?: 'release')
+def changelogFile = rootProject.layout.buildDirectory.file('release/changelog.md').get().asFile
+
+def versionProjects = rootProject.subprojects.findAll { it.name != 'common' }
+
+// Every version copies its jars into the shared root build/libs directory, so an upload task
+// must depend on all of those producers to satisfy Gradle's implicit-dependency validation.
+def publishArtifactTasks = versionProjects.collectMany { p ->
+    [p.tasks.named('build'), p.tasks.named('copyJarToRoot')]
+}
+
+def gameVersionsOf = { Project p ->
+    (p.findProperty('publish_game_versions') ?: p.minecraft_version)
+            .toString().split(',').collect { it.trim() }.findAll { !it.isEmpty() }
+}
+
+def artifactFile = { Project p, String suffix ->
+    rootProject.file("build/libs/${rootProject.archives_base_name}-${p.version}${suffix}")
+}
+
+rootProject.tasks.register('collectChangelog') {
+    group = 'publishing'
+    description = 'Collects the changelog shared by all Modrinth and CurseForge uploads.'
+    outputs.upToDateWhen { false }
+    doLast {
+        changelogFile.parentFile.mkdirs()
+
+        def provided = rootProject.findProperty('changelog') ?: System.getenv('CHANGELOG')
+        if (provided != null && !provided.toString().trim().isEmpty()) {
+            changelogFile.setText(provided.toString(), 'UTF-8')
+            rootProject.logger.lifecycle("Changelog loaded from ${rootProject.findProperty('changelog') != null ? '-Pchangelog' : 'CHANGELOG'}.")
+            return
+        }
+
+        def changelogPath = rootProject.findProperty('changelogFile')
+        if (changelogPath != null) {
+            def source = rootProject.file(changelogPath)
+            if (!source.isFile()) {
+                throw new GradleException("Changelog file does not exist: ${source}")
+            }
+            changelogFile.setText(source.getText('UTF-8'), 'UTF-8')
+            rootProject.logger.lifecycle("Changelog loaded from ${source}.")
+            return
+        }
+
+        if (System.getenv('CI') != null) {
+            throw new GradleException('No changelog was provided. In CI, pass -Pchangelog=... or -PchangelogFile=...')
+        }
+
+        rootProject.logger.lifecycle('')
+        rootProject.logger.lifecycle('Enter the changelog. A blank line finishes; Markdown is supported.')
+        def reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))
+        def lines = []
+        while (true) {
+            System.out.print(lines.isEmpty() ? 'Changelog: ' : '> ')
+            System.out.flush()
+            def line = reader.readLine()
+            if (line == null || line.trim().isEmpty()) {
+                break
+            }
+            lines.add(line)
+        }
+        if (lines.isEmpty()) {
+            throw new GradleException('The changelog is empty; publishing was cancelled.')
+        }
+        changelogFile.setText(lines.join('\n') + '\n', 'UTF-8')
+        rootProject.logger.lifecycle("Changelog saved to ${changelogFile}.")
+    }
+}
+
+versionProjects.each { Project p ->
+    p.apply plugin: 'com.modrinth.minotaur'
+    def jarFile = artifactFile(p, '.jar')
+    def sourcesFile = artifactFile(p, '-sources.jar')
+    def supportedGameVersions = gameVersionsOf(p)
+
+    p.extensions.getByName('modrinth').with {
+        token = modrinthToken
+        projectId = modrinthProjectId
+        versionNumber = p.version.toString()
+        versionName = "Simple Text Chat ${p.version}"
+        versionType = publishType
+        uploadFile = jarFile
+        additionalFiles = [sourcesFile]
+        gameVersions = supportedGameVersions
+        loaders = ['fabric']
+        changelog = p.providers.provider { changelogFile.getText('UTF-8') }
+        debugMode = publishDebug
+        dependencies {
+            required.project 'fabric-api'
+        }
+    }
+
+    p.tasks.named('modrinth').configure {
+        group = 'publishing'
+        dependsOn publishArtifactTasks
+        dependsOn ':collectChangelog'
+        doFirst {
+            if (!publishDebug && modrinthToken.isEmpty()) {
+                throw new GradleException('Modrinth token is empty. Set modrinth.token in secrets.json, MODRINTH_TOKEN, or -Pmodrinth_token=...')
+            }
+            if (!modrinthProjectId) {
+                throw new GradleException('Modrinth project ID is empty. Set modrinth_project_id in gradle.properties.')
+            }
+            if (!jarFile.isFile()) {
+                throw new GradleException("Missing upload file: ${jarFile}")
+            }
+            if (!sourcesFile.isFile()) {
+                throw new GradleException("Missing sources file: ${sourcesFile}")
+            }
+        }
+    }
+}
+
+// Uploading six ~25 MB jars concurrently saturates the connection and hits Minotaur/OkHttp's
+// 10-second socket timeout. Chain the Modrinth tasks so uploads happen one at a time.
+def modrinthUploadTasks = versionProjects.collect { it.tasks.named('modrinth') }
+modrinthUploadTasks.eachWithIndex { taskProvider, index ->
+    if (index > 0) {
+        taskProvider.configure {
+            mustRunAfter modrinthUploadTasks[index - 1]
+        }
+    }
+}
+
+rootProject.apply plugin: 'net.darkhax.curseforgegradle'
+
+// Applied scripts do not inherit the plugins-DSL compile classpath, so resolve the task type
+// from the plugin classloader instead of using a direct import.
+def curseTaskType = rootProject.plugins.findPlugin('net.darkhax.curseforgegradle').class.classLoader
+        .loadClass('net.darkhax.curseforgegradle.TaskPublishCurseForge')
+
+rootProject.tasks.register('publishCurseForge', curseTaskType) {
+    group = 'publishing'
+    description = 'Uploads every version jar in build/libs to CurseForge.'
+    apiToken = curseforgeToken
+    debugMode = publishDebug
+    disableVersionDetection()
+    dependsOn publishArtifactTasks
+    dependsOn ':collectChangelog'
+    mustRunAfter modrinthUploadTasks.last()
+
+    doFirst {
+        if (!publishDebug && curseforgeToken.isEmpty()) {
+            throw new GradleException('CurseForge token is empty. Set curseforge.token in secrets.json, CURSEFORGE_TOKEN, or -Pcurseforge_token=...')
+        }
+        if (!curseforgeProjectId) {
+            throw new GradleException('CurseForge project ID is empty. Set curseforge_project_id in gradle.properties.')
+        }
+        versionProjects.each { Project p ->
+            def jarFile = artifactFile(p, '.jar')
+            if (!jarFile.isFile()) {
+                throw new GradleException("Missing upload file: ${jarFile}")
+            }
+        }
+        getUploadArtifacts().each { artifact ->
+            rootProject.logger.lifecycle("CurseForge queued ${artifact.artifact.singleFile.name}: ${artifact.gameVersions}")
+        }
+    }
+
+    versionProjects.each { Project p ->
+        def jarFile = artifactFile(p, '.jar')
+        def mainFile = upload(curseforgeProjectId, jarFile)
+        mainFile.changelog = rootProject.providers.provider { changelogFile.getText('UTF-8') }
+        mainFile.changelogType = 'markdown'
+        mainFile.releaseType = publishType
+        gameVersionsOf(p).each { mainFile.addGameVersion(it) }
+        mainFile.addModLoader('Fabric')
+        mainFile.addEnvironment('Client')
+        mainFile.addRequirement('fabric-api')
+    }
+}
+
+rootProject.tasks.register('publishModrinth') {
+    group = 'publishing'
+    description = 'Uploads every version jar in build/libs to Modrinth.'
+    dependsOn versionProjects.collect { "${it.path}:modrinth" }
+}
+
+rootProject.tasks.register('publishMods') {
+    group = 'publishing'
+    description = 'Builds every included version and uploads the jars to Modrinth and CurseForge.'
+    dependsOn 'publishModrinth', 'publishCurseForge'
+}
