@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
 public class HudTexts implements HudElement {
-    public volatile static Component text = VersionDifferences.translatableComponent("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
+    public volatile static Component text = AllTranslations.HUD_STATUS_DISABLED.msg.withStyle(ChatFormatting.YELLOW);
     
     @Override
     public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, @NonNull DeltaTracker deltaTracker) {

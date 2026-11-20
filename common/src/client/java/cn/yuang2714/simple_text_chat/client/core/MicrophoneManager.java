@@ -2,6 +2,7 @@ package cn.yuang2714.simple_text_chat.client.core;
 
 import cn.yuang2714.simple_text_chat.SimpleTextChat;
 import cn.yuang2714.simple_text_chat.client.config.Config;
+import cn.yuang2714.simple_text_chat.client.minecrafts.AllTranslations;
 import cn.yuang2714.simple_text_chat.client.minecrafts.VersionDifferences;
 import net.minecraft.network.chat.Component;
 
@@ -58,7 +59,7 @@ public class MicrophoneManager {
     }
     
     public static Component getDisplayName(Mixer.Info info) {
-        if (info == null || info.equals(EMPTY)) return VersionDifferences.translatableComponent("gui.simple_text_chat.microphone.none");
+        if (info == null || info.equals(EMPTY)) return AllTranslations.GUI_MICROPHONE_NONE;
         
         String nameWithoutPortPrefix = info.getName().replaceFirst("^Port ?", "");
         
@@ -74,7 +75,7 @@ public class MicrophoneManager {
         if (!tagKey.isEmpty())
             return
                     Component.empty()
-                            .append(VersionDifferences.translatableComponent("gui.simple_text_chat.microphone.tag." + tagKey))
+                            .append(VersionDifferences.translatableComponent("gui.text_chat.microphone.tag." + tagKey))
                             .append(VersionDifferences.literalComponent(nameWithoutPortPrefix));
         else return VersionDifferences.literalComponent(nameWithoutPortPrefix);
     }
