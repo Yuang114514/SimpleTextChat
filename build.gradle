@@ -121,6 +121,17 @@ subprojects { Project sub ->
     //common的特殊配置
 
     if (sub.name == 'common') {
+        tasks.register("genTranslations", JavaExec) {
+            group = 'build'
+
+            classpath = sourceSets.main.runtimeClasspath
+            mainClass = 'cn.yuang2714.simple_text_chat.STCCodeGenerator'
+
+            args = [
+                    "${projectDir}/src/main/resources/assets/text_chat/lang/en_us.json"
+            ]
+        }
+
         tasks.named("jar") {
             enabled = false
         }

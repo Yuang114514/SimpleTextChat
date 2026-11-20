@@ -43,14 +43,14 @@
 	"gui.text_chat.advanced_config.dictionary.tooltip": "Set model's dictionary.\nOn small models it will replace output, and on big models it is no effect at all. ^(-_-)^",
 
 	"gui.text_chat.advanced_config.sample_rate": "Sample Rate",
-	"gui.text_chat.advanced_config.sample_rate.tooltip": "Set to 0 for auto sample rate.",
+	"gui.text_chat.advanced_config.sample_rate.tooltip": "Not all microphones support all sample rate!",
 	"gui.text_chat.advanced_config.buffer_length": "Buffer Length",
 
-	"gui.simple_text_chat.microphone.tag.virtual": "[Virtual] ",
-	"gui.simple_text_chat.microphone.tag.loopback": "[Loopback] ",
-	"gui.simple_text_chat.microphone.tag.hardware": "[Hardware] ",
-	"gui.simple_text_chat.microphone.tag.default": "[Default] ",
-	"gui.simple_text_chat.microphone.none": "[Microphone not Found]",
+	"gui.text_chat.microphone.tag.virtual": "[Virtual] ",
+	"gui.text_chat.microphone.tag.loopback": "[Loopback] ",
+	"gui.text_chat.microphone.tag.hardware": "[Hardware] ",
+	"gui.text_chat.microphone.tag.default": "[Default] ",
+	"gui.text_chat.microphone.none": "[Microphone not Found]",
 
 	"gui.text_chat.advanced_config.complete": "Save and Exit",
 	"gui.text_chat.advanced_config.complete.json_syntax_error": "Not a valid JSON Array!",

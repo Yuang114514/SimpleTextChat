@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import org.vosk.Model;
 
@@ -35,7 +36,7 @@ public class ConfigScreen extends Screen {
     private boolean isVerified = true;
     
     public ConfigScreen(Screen parentScreen) {
-        super(VersionDifferences.translatableComponent("gui.text_chat.setup.title"));
+        super(AllTranslations.GUI_SETUP_TITLE);
         this.parentScreen = parentScreen;
         
         RecognizationMode cfgRecognizationMode;
@@ -70,8 +71,8 @@ public class ConfigScreen extends Screen {
         
         graphics.drawString(
                 font,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.title"),
-                width / 2 - font.width(VersionDifferences.translatableComponent("gui.text_chat.setup.title")) / 2,
+                AllTranslations.GUI_SETUP_TITLE,
+                width / 2 - font.width(AllTranslations.GUI_SETUP_TITLE) / 2,
                 40,
                 0xFF_FF_FF_FF,
                 true
@@ -105,35 +106,35 @@ public class ConfigScreen extends Screen {
         
         modelLine.addChild(
                 new StringWidget(
-                        VersionDifferences.translatableComponent("gui.text_chat.setup.model.info"),
+                        AllTranslations.GUI_SETUP_MODEL_INFO,
                         font
                 )
         );
         
         modelPath = new EditBox(
                 font,
-                0,0,
-                295 - font.width(VersionDifferences.translatableComponent("gui.text_chat.setup.model.info")),
+                0, 0,
+                295 - font.width(AllTranslations.GUI_SETUP_MODEL_INFO),
                 20,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.model.info")
+                Component.empty()
         );
         modelPath.setMaxLength(Integer.MAX_VALUE);
         modelPath.setValue(lastModelPath);
-        modelPath.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.model_path.tooltip")));
+        modelPath.setTooltip(Tooltip.create(AllTranslations.GUI_SETUP_MODEL_PATH_TOOLTIP));
         modelPath.setResponder(this::onModelPathChange);
         
         modelLine.addChild(modelPath);
         
         modelLine.addChild(
                 Button.builder(
-                        VersionDifferences.translatableComponent("gui.text_chat.setup.model.download_button_text"),
+                        AllTranslations.GUI_SETUP_MODEL_DOWNLOAD_BUTTON_TEXT,
                         ignored -> MinecraftVersionHelper.HELPER.openUri("https://alphacephei.com/vosk/models")
                 ).bounds(
                         0,0,
                         95,
                         20
                 ).tooltip(
-                        Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.model.tooltip"))
+                        Tooltip.create(AllTranslations.GUI_SETUP_MODEL_TOOLTIP)
                 ).build()
         );
         modelLine.arrangeElements();
@@ -149,7 +150,7 @@ public class ConfigScreen extends Screen {
                 0,0,
                 400,
                 20,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.mode.info"),
+                AllTranslations.GUI_SETUP_MODE_INFO,
                 (button, recognizationMode) ->
                         button.setTooltip(Tooltip.create(recognizationMode.getTooltip()))
         );
@@ -165,11 +166,11 @@ public class ConfigScreen extends Screen {
                 0,0,
                 400,
                 20,
-                VersionDifferences.translatableComponent("gui.text_chat.setup.lang.info"),
+                AllTranslations.GUI_SETUP_LANG_INFO,
                 (button, ignored) ->
-                        button.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.lang.tooltip")))
+                        button.setTooltip(Tooltip.create(AllTranslations.GUI_SETUP_LANG_TOOLTIP))
         );
-        languages.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.lang.tooltip")));
+        languages.setTooltip(Tooltip.create(AllTranslations.GUI_SETUP_LANG_TOOLTIP));
         layout.addChild(languages);
         
         
@@ -187,7 +188,7 @@ public class ConfigScreen extends Screen {
                         0,0,
                         400,
                         20,
-                        VersionDifferences.translatableComponent("gui.text_chat.advanced_config.microphone.name"),
+                        AllTranslations.GUI_ADVANCED_CONFIG_MICROPHONE_NAME,
                         (cycleButton, value) -> cycleButton.setTooltip(Tooltip.create(
                                 MicrophoneManager.getDisplayName(value)))
                 );
@@ -195,10 +196,10 @@ public class ConfigScreen extends Screen {
         
         layout.addChild(
                 Button.builder(
-                        VersionDifferences.translatableComponent("gui.text_chat.advanced_config.title"),
+                        AllTranslations.GUI_ADVANCED_CONFIG_TITLE,
                         ignored -> MinecraftVersionHelper.HELPER.setScreen(new AdvancedConfigScreen(this))
                 ).tooltip(
-                        Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.advanced_config.warn"))
+                        Tooltip.create(AllTranslations.GUI_ADVANCED_CONFIG_WARN)
                 ).bounds(
                         0,0,
                         400,
@@ -211,10 +212,10 @@ public class ConfigScreen extends Screen {
         
         verify = exitRow.addChild(
                 Button.builder(
-                        VersionDifferences.translatableComponent("gui.text_chat.setup.verify"),
+                        AllTranslations.GUI_SETUP_VERIFY,
                         this::verify
                 ).tooltip(
-                        Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.verify.tooltip"))
+                        Tooltip.create(AllTranslations.GUI_SETUP_VERIFY_TOOLTIP)
                 ).bounds(
                         0,0,
                         198,
@@ -224,10 +225,10 @@ public class ConfigScreen extends Screen {
         
         saveAndExit = exitRow.addChild(
                 Button.builder(
-                        VersionDifferences.translatableComponent("gui.text_chat.setup.complete"),
+                        AllTranslations.GUI_SETUP_COMPLETE,
                         this::saveAndExit
                 ).tooltip(
-                        Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.complete.tooltip"))
+                        Tooltip.create(AllTranslations.GUI_SETUP_COMPLETE_TOOLTIP)
                 ).bounds(
                         0,0,
                         198,
@@ -248,14 +249,14 @@ public class ConfigScreen extends Screen {
     public void tick() {
         if (isVerified) {
             verify.active = false;
-            verify.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.verify.noneed")));
+            verify.setTooltip(Tooltip.create(AllTranslations.GUI_SETUP_VERIFY_NONEED));
             saveAndExit.active = true;
-            saveAndExit.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.complete.tooltip")));
+            saveAndExit.setTooltip(Tooltip.create(AllTranslations.GUI_SETUP_COMPLETE_TOOLTIP));
         } else {
             verify.active = true;
-            verify.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.verify.tooltip")));
+            verify.setTooltip(Tooltip.create(AllTranslations.GUI_SETUP_VERIFY_TOOLTIP));
             saveAndExit.active = false;
-            saveAndExit.setTooltip(Tooltip.create(VersionDifferences.translatableComponent("gui.text_chat.setup.complete.tooltip.need_verify")));
+            saveAndExit.setTooltip(Tooltip.create(AllTranslations.GUI_SETUP_COMPLETE_TOOLTIP_NEED_VERIFY));
         }
     }
     
@@ -265,7 +266,7 @@ public class ConfigScreen extends Screen {
     }
     
     private void verify(Button button) {
-        button.setMessage(VersionDifferences.translatableComponent("gui.text_chat.setup.verify.ing"));
+        button.setMessage(AllTranslations.GUI_SETUP_VERIFY_ING);
         
         try {
             Model model = new Model(modelPath.getValue());
@@ -273,13 +274,13 @@ public class ConfigScreen extends Screen {
         } catch (IOException e) {
             isVerified = false;
             LOGGER.warn("User entered an invalid path", e);
-            button.setMessage(VersionDifferences.translatableComponent("gui.text_chat.setup.verify.error.invalid_path").withStyle(ChatFormatting.RED));
+            button.setMessage(AllTranslations.GUI_SETUP_VERIFY_ERROR_INVALID_PATH.msg.withStyle(ChatFormatting.RED));
             return;
         }
         
         isVerified = true;
         lastModelPath = modelPath.getValue();
-        button.setMessage(VersionDifferences.translatableComponent("gui.text_chat.setup.verify.complete"));
+        button.setMessage(AllTranslations.GUI_SETUP_VERIFY_COMPLETE);
     }
     
     private void saveAndExit(Button button) {
@@ -291,7 +292,7 @@ public class ConfigScreen extends Screen {
             Config.setMicrophoneName(microphones.getValue().getName());
         } catch (Exception e) {
             LOGGER.error("Failed to storage into Config.", e);
-            button.setMessage(VersionDifferences.translatableComponent("gui.text_chat.setup.complete.error.failed_to_config"));
+            button.setMessage(AllTranslations.GUI_SETUP_COMPLETE_ERROR_FAILED_TO_CONFIG);
             return;
         }
         
@@ -300,7 +301,7 @@ public class ConfigScreen extends Screen {
     
     private void onModelPathChange(String s) {
         isVerified = s.equals(lastModelPath);
-        verify.setMessage(VersionDifferences.translatableComponent("gui.text_chat.setup.verify"));
+        verify.setMessage(AllTranslations.GUI_SETUP_VERIFY);
         
         if (s.contains("cn")) languages.setValue(ModelLanguage.CHINESE);
         else if (s.contains("en")) languages.setValue(ModelLanguage.ENGLISH);

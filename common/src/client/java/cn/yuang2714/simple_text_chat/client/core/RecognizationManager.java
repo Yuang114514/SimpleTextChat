@@ -6,6 +6,7 @@ import cn.yuang2714.simple_text_chat.client.api.SimpleTextChatRecognizationEvent
 import cn.yuang2714.simple_text_chat.client.config.Config;
 import cn.yuang2714.simple_text_chat.client.config.ModelLanguage;
 import cn.yuang2714.simple_text_chat.client.config.RecognizationMode;
+import cn.yuang2714.simple_text_chat.client.minecrafts.AllTranslations;
 import cn.yuang2714.simple_text_chat.client.minecrafts.HudTexts;
 import cn.yuang2714.simple_text_chat.client.minecrafts.VersionDifferences;
 import com.google.gson.JsonObject;
@@ -70,7 +71,7 @@ public class RecognizationManager extends Thread {
         
         setName("Recognization Manager Thread");
         
-        HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.ready").withStyle(ChatFormatting.GREEN);
+        HudTexts.text = AllTranslations.HUD_STATUS_READY.msg.withStyle(ChatFormatting.GREEN);
         LOGGER.info("Recognization Manager Started. RecognizationMode: {}", recognizationMode);
     }
     
@@ -87,7 +88,7 @@ public class RecognizationManager extends Thread {
             microphoneName = MicrophoneManager.getDisplayName(MicrophoneManager.getMicrophoneFromConfig(MicrophoneManager.listMixers(false)).orElseThrow());
         } catch (Exception e) {
             LOGGER.error("Failed to initialize Recognization Manager.", e);
-            HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
+            HudTexts.text = AllTranslations.HUD_STATUS_SETUP_FAILED.msg.withStyle(ChatFormatting.RED);
         }
         
         HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.preparing", model, mode, microphoneName).withStyle(ChatFormatting.GREEN);
@@ -97,7 +98,7 @@ public class RecognizationManager extends Thread {
                 INSTANCE = new RecognizationManager();
             } catch (Exception e) {
                 LOGGER.error("Failed to initialize Recognization Manager.", e);
-                HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.setup_failed").withStyle(ChatFormatting.RED);
+                HudTexts.text = AllTranslations.HUD_STATUS_SETUP_FAILED.msg.withStyle(ChatFormatting.RED);
                 hasActiveInitializer = false;
                 return;
             }
@@ -138,7 +139,7 @@ public class RecognizationManager extends Thread {
             RecognizationManager.setup();
         } else {
             if (RecognizationManager.INSTANCE != null) RecognizationManager.INSTANCE.clean();
-            HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.disabled").withStyle(ChatFormatting.YELLOW);
+            HudTexts.text = AllTranslations.HUD_STATUS_DISABLED.msg.withStyle(ChatFormatting.YELLOW);
         }
     }
     
@@ -191,7 +192,7 @@ public class RecognizationManager extends Thread {
                 (
                         isRecording
                         ? VersionDifferences.translatableComponent("hud.text_chat.status.ing", addCursor(partialResult))
-                        : VersionDifferences.translatableComponent("hud.text_chat.status.ready")
+                        : AllTranslations.HUD_STATUS_READY
                 ),
                 recognizationMode.getName()
         );
@@ -227,7 +228,7 @@ public class RecognizationManager extends Thread {
     public void clean() {
         LOGGER.info("Cleaning up Recognization Manager.");
         isFinished = true;
-        HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.disabled");
+        HudTexts.text = AllTranslations.HUD_STATUS_DISABLED.msg.withStyle(ChatFormatting.RED);
         
         try {
             recognizationThread.join();
@@ -292,7 +293,7 @@ public class RecognizationManager extends Thread {
             }
         } catch (LineUnavailableException e) {
             SimpleTextChat.LOGGER.error("Audio line not available.", e);
-            HudTexts.text = VersionDifferences.translatableComponent("hud.text_chat.status.line_unavailable").withStyle(ChatFormatting.RED);
+            HudTexts.text = AllTranslations.HUD_STATUS_LINE_UNAVAILABLE.msg.withStyle(ChatFormatting.RED);
         } finally {
             recognizer.close();
             model.close();

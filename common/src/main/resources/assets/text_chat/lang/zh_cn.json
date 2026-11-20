@@ -43,7 +43,7 @@
 	"gui.text_chat.advanced_config.dictionary.tooltip": "设置模型的词典。\n在小模型上词典会完全替换输出，而在大模型上词典一点用都没有。 ^(-_-)^",
 
 	"gui.text_chat.advanced_config.sample_rate": "音频采样率",
-	"gui.text_chat.advanced_config.sample_rate.tooltip": "设置为 0 来启用自适应采样率",
+	"gui.text_chat.advanced_config.sample_rate.tooltip": "不是所有麦克风都支持自定义采样率！",
 	"gui.text_chat.advanced_config.buffer_length": "缓冲区长度",
 
 	"gui.simple_text_chat.microphone.tag.virtual": "[虚拟] ",
